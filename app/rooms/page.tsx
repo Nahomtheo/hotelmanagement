@@ -1,0 +1,241 @@
+'use client';
+
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
+
+export default function RoomsPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [checkInDate, setCheckInDate] = useState('');
+  const [checkOutDate, setCheckOutDate] = useState('');
+  const [selectedRoom, setSelectedRoom] = useState<any>(null);
+  const [showBookingForm, setShowBookingForm] = useState(false);
+
+  useEffect(() => {
+    fetchRooms();
+  }, []);
+
+  const fetchRooms = async () => {
+    try {
+      const res = await fetch('/api/rooms');
+      const data = await res.json();
+      if (data.success) {
+        setRooms(data.data.rooms);
+      }
+    } catch (error) {
+      console.error('Error fetching rooms:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBookRoom = (room: any) => {
+    if (!(session?.user as any)?.id) {
+      router.push('/auth/login');
+      return;
+    }
+    setSelectedRoom(room);
+    setShowBookingForm(true);
+  };
+
+  const handleSubmitBooking = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!(session?.user as any)?.id) return;
+
+    const formData = new FormData(e.currentTarget);
+    const numberOfNights = Math.ceil(
+      (new Date(checkOutDate).getTime() - new Date(checkInDate).getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    try {
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomId: selectedRoom._id,
+          guestName: formData.get('guestName'),
+          guestEmail: formData.get('guestEmail'),
+          guestPhone: formData.get('guestPhone'),
+          checkInDate: new Date(checkInDate),
+          checkOutDate: new Date(checkOutDate),
+          numberOfGuests: parseInt(formData.get('numberOfGuests') as string),
+          specialRequests: formData.get('specialRequests'),
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        alert('Booking created successfully!');
+        setShowBookingForm(false);
+        setSelectedRoom(null);
+        fetchRooms();
+      } else {
+        alert(data.message || 'Booking failed');
+      }
+    } catch (error) {
+      console.error('Booking error:', error);
+      alert('Failed to create booking');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Navbar */}
+      <nav className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          <Link href="/dashboard">
+            <h1 className="text-2xl font-bold text-blue-600 cursor-pointer">Hotel Booking</h1>
+          </Link>
+          {session?.user && (
+            <div className="flex gap-4">
+              <Link href="/dashboard">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">Dashboard</Button>
+              </Link>
+            </div>
+          )}
+        </div>
+      </nav>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Available Rooms</h1>
+          <div className="grid md:grid-cols-2 gap-4 bg-white rounded-lg shadow p-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Check-in Date</label>
+              <input
+                type="date"
+                value={checkInDate}
+                onChange={(e) => setCheckInDate(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Check-out Date</label>
+              <input
+                type="date"
+                value={checkOutDate}
+                onChange={(e) => setCheckOutDate(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        </div>
+
+        {loading ? (
+          <p className="text-center text-gray-600">Loading rooms...</p>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {rooms.map((room: any) => (
+              <div key={room._id} className="bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-32 flex items-center justify-center">
+                  <div className="text-5xl">🏨</div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Room {room.roomNumber}</h3>
+                  <p className="text-sm text-gray-600 mb-2 capitalize">{room.type} Room</p>
+                  <p className="text-sm text-gray-600 mb-4">Max Guests: {room.maxGuests}</p>
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-2xl font-bold text-blue-600">${room.pricePerNight}</span>
+                    <span className={`px-3 py-1 rounded text-sm font-semibold ${
+                      room.status === 'available' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    }`}>
+                      {room.status}
+                    </span>
+                  </div>
+                  <Button
+                    onClick={() => handleBookRoom(room)}
+                    disabled={room.status !== 'available'}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+                  >
+                    Book Now
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Booking Modal */}
+      {showBookingForm && selectedRoom && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Book Room {selectedRoom.roomNumber}</h2>
+            <form onSubmit={handleSubmitBooking} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Guest Name</label>
+                <input
+                  type="text"
+                  name="guestName"
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  name="guestEmail"
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <input
+                  type="tel"
+                  name="guestPhone"
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Number of Guests</label>
+                <input
+                  type="number"
+                  name="numberOfGuests"
+                  min="1"
+                  max={selectedRoom.maxGuests}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Special Requests</label>
+                <textarea
+                  name="specialRequests"
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="flex gap-4">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setShowBookingForm(false);
+                    setSelectedRoom(null);
+                  }}
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Confirm Booking
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

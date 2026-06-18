@@ -7,7 +7,10 @@ export interface IRoom extends Document {
   pricePerNight: number;
   maxGuests: number;
   amenities: string[];
-  images: string[];
+  images:[{
+      url: String,
+      publicId: String
+    }];
   description: string;
   status: 'available' | 'occupied' | 'maintenance';
   isDeleted: boolean;
@@ -44,7 +47,10 @@ const roomSchema = new Schema<IRoom>(
       min: 1,
     },
     amenities: [String],
-    images: [String],
+    images:[ {
+      url: String,
+      publicId: String
+    }],
     description: {
       type: String,
       trim: true,

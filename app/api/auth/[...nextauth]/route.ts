@@ -2,6 +2,7 @@ import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { connectDB } from '@/lib/mongodb';
 import User from '@/lib/mongodb/models/User';
+import bcrypt from 'bcryptjs';
 
 const authOptions: NextAuthOptions = {
   providers: [
@@ -32,7 +33,10 @@ const authOptions: NextAuthOptions = {
             throw new Error('Please verify your email first');
           }
 
-          const isPasswordValid = await user.comparePassword(credentials.password);
+          const isPasswordValid =  await bcrypt.compare(
+                                                           credentials.password,
+                                                          user.password
+                                                              );
 
           if (!isPasswordValid) {
             throw new Error('Invalid password');

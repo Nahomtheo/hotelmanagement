@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
+import { signOut } from 'next-auth/react';
 
 
 export default function DashboardPage() {
@@ -57,9 +58,9 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold text-blue-600">Hotel Booking</h1>
           <div className="flex items-center gap-4">
             <span className="text-gray-700">Welcome, {userName}!</span>
-            <Link href="/auth/logout">
-              <Button className="bg-red-600 hover:bg-red-700 text-white">Sign Out</Button>
-            </Link>
+            
+              <Button onClick={() => signOut()} className="bg-red-600 hover:bg-red-700 text-white">Sign Out</Button>
+            
           </div>
         </div>
       </nav>

@@ -73,14 +73,17 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
+    console.log('Received room creation request:', body);
 
     // Validate input
     const validation = roomCreationSchema.safeParse(body);
     if (!validation.success) {
+      console.log('Validation errors:', validation.error.flatten().fieldErrors);
       return NextResponse.json(
         errorResponse('Validation failed', 400, validation.error.flatten().fieldErrors as any),
         { status: 400 }
       );
+      
     }
 
     await connectDB();
@@ -89,10 +92,10 @@ export async function POST(req: NextRequest) {
     let hotel = await Hotel.findOne({ isDeleted: false });
     if (!hotel) {
       hotel = new Hotel({
-        name: 'Default Hotel',
-        address: 'Hotel Address',
-        city: 'City',
-        country: 'Country',
+        name: 'MW Hotel',
+        address: 'Bole ednamall',
+        city: 'Addis Ababa',
+        country: 'Ethiopia',
       });
       await hotel.save();
     }

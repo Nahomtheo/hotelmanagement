@@ -2,25 +2,26 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { errorResponse, successResponse } from '@/lib/utils/errorHandler';
 import { checkOutGuest } from '@/lib/services/bookingService';
-import { authOptions } from '../../../auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await getServerSession(authOptions);
     const role = (session?.user as any)?.role;
 
-    if (!session?.user?.id || (role !== 'receptionist' && role !== 'admin')) {
+    if (!(session?.user as any).id || (role !== 'receptionist' && role !== 'admin')) {
       return NextResponse.json(
         errorResponse('Unauthorized'),
         { status: 401 }
       );
     }
 
-    const bookingId = params.id;
-    const booking = await checkOutGuest(bookingId);
+    const booking = await params;
+    const bookingId = booking.id;
+    const bookings = await checkOutGuest(bookingId);
 
     return NextResponse.json(
-      successResponse(booking, 'Guest checked out successfully')
+      successResponse(bookings, 'Guest checked out successfully')
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Operation failed';

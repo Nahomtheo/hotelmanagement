@@ -2,7 +2,7 @@ import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { connectDB } from './mongodb';
 import User from './mongodb/models/User';
-
+import bcrypt from 'bcryptjs';
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -32,7 +32,10 @@ export const authOptions: NextAuthOptions = {
             throw new Error('Please verify your email first');
           }
 
-          const isPasswordValid = await user.comparePassword(credentials.password);
+          const isPasswordValid = await bcrypt.compare(
+                                                 credentials.password,
+                                                user.password
+                                                    );
 
           if (!isPasswordValid) {
             throw new Error('Invalid password');
@@ -62,7 +65,7 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
+        (session.user as any).id = token.id as string;
         (session.user as any).role = token.role;
       }
       return session;

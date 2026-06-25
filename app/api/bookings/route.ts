@@ -72,6 +72,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
+    console.log('Booking request body:', body); // Log the request body for debugging
 
     // Validate input
     const validation = bookingValidationSchema.safeParse(body);

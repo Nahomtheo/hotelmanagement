@@ -1,6 +1,6 @@
 import { connectDB } from '../mongodb';
 import Booking, { IBooking } from '../mongodb/models/Booking';
-import Room from '../mongodb/models/Room';
+import Room, { IRoom } from '../mongodb/models/Room';
 import User from '../mongodb/models/User';
 import { calculateNights, calculateTotalPrice, checkDateOverlap } from '../utils/dateHelpers';
 import { sendBookingConfirmation, createNotification, sendBookingCancellation } from './notificationService';
@@ -57,7 +57,7 @@ export async function getAvailableRooms(
   checkOut: Date,
   maxGuests?: number,
   roomType?: string
-): Promise<IBooking[]> {
+): Promise<IRoom[]> {
   try {
     await connectDB();
 
@@ -77,7 +77,7 @@ export async function getAvailableRooms(
     const availableRooms = await Room.find(query);
 
     // Filter out rooms with conflicting bookings
-    const filtered = [];
+    const filtered: IRoom[] = [];
 
     for (const room of availableRooms) {
       const isAvailable = await checkRoomAvailability(

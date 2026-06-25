@@ -103,12 +103,18 @@ export async function POST(req: NextRequest) {
     const room = new Room({
       hotelId: hotel._id,
       ...validation.data,
+      images: body.images || [],
+      description: body.description || '',
+      status: 'available',
+      isDeleted: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     await room.save();
 
     return NextResponse.json(
-      successResponse(room, 'Room created successfully', 201),
+      successResponse(room, 'Room created successfully' , 201),
       { status: 201 }
     );
   } catch (error) {

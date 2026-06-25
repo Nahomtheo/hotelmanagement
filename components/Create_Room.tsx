@@ -65,7 +65,7 @@ export default function CreateRoomForm() {
 
       const data = await res.json();
       const fulldata={
-        url: `${process.env.NEXT_PUBLIC_R2_ENDPOINT}/${data.key}`,
+        url: `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${data.key}`,
         publicId: data.key
       }
 
@@ -101,6 +101,7 @@ export default function CreateRoomForm() {
 
 
     const imageKeys = await uploadImages();
+    console.log("Uploaded image keys:", imageKeys);
 
 
     const roomData = {

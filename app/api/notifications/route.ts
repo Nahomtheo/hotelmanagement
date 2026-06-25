@@ -3,13 +3,13 @@ import { getServerSession } from 'next-auth';
 import { connectDB } from '@/lib/mongodb';
 import Notification from '@/lib/mongodb/models/Notification';
 import { errorResponse, successResponse } from '@/lib/utils/errorHandler';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.id) {
+    if ((!session?.user as any)?.id) {
       return NextResponse.json(
         errorResponse('Unauthorized'),
         { status: 401 }
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     await connectDB();
 
     let query: any = {
-      userId: session.user.id,
+      userId: (session?.user as any).id,
       isDeleted: false,
     };
 
@@ -59,7 +59,7 @@ export async function PUT(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.id) {
+    if ((!session?.user as any)?.id) {
       return NextResponse.json(
         errorResponse('Unauthorized'),
         { status: 401 }
@@ -80,7 +80,7 @@ export async function PUT(req: NextRequest) {
     await Notification.updateMany(
       {
         _id: { $in: notificationIds },
-        userId: session.user.id,
+        userId: (session?.user as any).id,
       },
       { read: true }
     );

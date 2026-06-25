@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
+import RoomImageCard from '@/components/ui/imagecard';
 
 export default function RoomsPage() {
   const { data: session, status } = useSession();
@@ -15,6 +16,17 @@ export default function RoomsPage() {
   const [checkOutDate, setCheckOutDate] = useState('');
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
+   const numberOfNights =
+  checkInDate && checkOutDate
+    ? Math.max(
+        0,
+        Math.ceil(
+          (new Date(checkOutDate).getTime() -
+            new Date(checkInDate).getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
+      )
+    : 0;
 
   useEffect(() => {
     fetchRooms();
@@ -48,9 +60,7 @@ export default function RoomsPage() {
     if (!(session?.user as any)?.id) return;
 
     const formData = new FormData(e.currentTarget);
-    const numberOfNights = Math.ceil(
-      (new Date(checkOutDate).getTime() - new Date(checkInDate).getTime()) / (1000 * 60 * 60 * 24)
-    );
+
 
     try {
       const res = await fetch('/api/bookings', {
@@ -133,8 +143,14 @@ export default function RoomsPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {rooms.map((room: any) => (
               <div key={room._id} className="bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-32 flex items-center justify-center">
-                  <div className="text-5xl">🏨</div>
+               <div className="relative h-64 overflow-hidden rounded-2xl">
+                {room.images && room.images.length > 0 ? (
+                    <RoomImageCard images={room.images} />
+                  ) : (
+                   <div className="flex h-full items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-600">
+                     <div className="text-5xl">🏨</div>
+                   </div>
+                  )}
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Room {room.roomNumber}</h3>
@@ -164,78 +180,206 @@ export default function RoomsPage() {
 
       {/* Booking Modal */}
       {showBookingForm && selectedRoom && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Book Room {selectedRoom.roomNumber}</h2>
-            <form onSubmit={handleSubmitBooking} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Guest Name</label>
-                <input
-                  type="text"
-                  name="guestName"
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  name="guestEmail"
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                <input
-                  type="tel"
-                  name="guestPhone"
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Number of Guests</label>
-                <input
-                  type="number"
-                  name="numberOfGuests"
-                  min="1"
-                  max={selectedRoom.maxGuests}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Special Requests</label>
-                <textarea
-                  name="specialRequests"
-                  rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="flex gap-4">
-                <Button
-                  type="button"
-                  onClick={() => {
-                    setShowBookingForm(false);
-                    setSelectedRoom(null);
-                  }}
-                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  Confirm Booking
-                </Button>
-              </div>
-            </form>
+ <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm">
+  <div className="flex min-h-screen items-center justify-center p-4">
+    <div className="flex max-h-[90vh] w-full max-w-2xl flex-col rounded-3xl bg-white shadow-2xl">
+
+     
+    {/* Header */}
+     <div className="sticky top-0 z-10 rounded-t-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-8 py-6 text-white">
+        
+    <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-8 py-6 text-white">
+      <h2 className="text-3xl font-bold">
+        Reserve Room {selectedRoom?.roomNumber}
+      </h2>
+
+      <p className="mt-1 text-slate-300">
+        Complete your reservation details
+      </p>
+    </div>
+    </div>
+<div className="overflow-y-auto p-8">
+    <form
+      onSubmit={handleSubmitBooking}
+      className="space-y-6 p-8"
+    >
+
+      {/* Room Summary */}
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-slate-500">
+              Room Type
+            </p>
+
+            <p className="font-semibold capitalize">
+              {selectedRoom.type}
+            </p>
+          </div>
+
+          <div className="text-right">
+            <p className="text-sm text-slate-500">
+              Per Night
+            </p>
+
+            <p className="text-xl font-bold text-emerald-600">
+              ${selectedRoom.pricePerNight}
+            </p>
           </div>
         </div>
+      </div>
+
+      {/* Guest Name */}
+      <div>
+        <label className="mb-2 block text-sm font-medium text-slate-700">
+          Guest Name
+        </label>
+
+        <input
+          type="text"
+          name="guestName"
+          required
+          className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+        />
+      </div>
+
+      {/* Email + Phone */}
+      <div className="grid gap-4 md:grid-cols-2">
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-700">
+            Email
+          </label>
+
+          <input
+            type="email"
+            name="guestEmail"
+            required
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-700">
+            Phone
+          </label>
+
+          <input
+            type="tel"
+            name="guestPhone"
+            required
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+          />
+        </div>
+
+      </div>
+
+      {/* Check In / Check Out */}
+      <div className="grid gap-4 md:grid-cols-2">
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-700">
+            Check-In Date
+          </label>
+
+          <input
+            type="date"
+            name="checkIn"
+            required
+            min={new Date().toISOString().split("T")[0]}
+            onChange={(e) => setCheckInDate(e.target.value)}
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-700">
+            Check-Out Date
+          </label>
+
+          <input
+            type="date"
+            name="checkOut"
+            required
+            onChange={(e) => setCheckOutDate(e.target.value)}
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+          />
+        </div>
+        {numberOfNights > 0 && (
+          <div className="md:col-span-2">
+            <p className="text-sm text-slate-500">
+              Total Nights: {numberOfNights}
+            </p>
+            <p className="text-lg font-semibold text-emerald-600">
+              Total Price: ${numberOfNights * selectedRoom.pricePerNight}
+            </p>
+          </div>
+        )}
+
+      </div>
+
+      {/* Guests */}
+      <div>
+        <label className="mb-2 block text-sm font-medium text-slate-700">
+          Number of Guests
+        </label>
+
+        <input
+          type="number"
+          name="numberOfGuests"
+          min="1"
+          max={selectedRoom.maxGuests}
+          required
+          className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+        />
+      </div>
+
+      {/* Special Requests */}
+      <div>
+        <label className="mb-2 block text-sm font-medium text-slate-700">
+          Special Requests
+        </label>
+
+        <textarea
+          name="specialRequests"
+          rows={4}
+          placeholder="Airport pickup, late check-in, extra pillows..."
+          className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+        />
+      </div>
+
+      {/* Actions */}
+      <div className="flex gap-4 pt-2">
+
+        <button
+          type="button"
+          onClick={() => {
+            setShowBookingForm(false);
+            setSelectedRoom(null);
+          }}
+          className="flex-1 rounded-xl border border-slate-300 py-3 font-medium text-slate-700 transition hover:bg-slate-100"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          className="flex-1 rounded-xl bg-gradient-to-r from-slate-900 to-slate-700 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.02]"
+        >
+          Confirm Reservation
+        </button>
+
+      </div>
+
+    </form>
+    </div>
+
+    
+  </div>
+</div>
+</div>
       )}
+
     </div>
   );
 }

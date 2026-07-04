@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import Providers from './provider'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
-
+import ModernNavbar from '@/components/ui/navbar'
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
@@ -42,6 +42,7 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="font-sans antialiased">
         <Providers>
+          <ModernNavbar />
           {children}
         </Providers>
         {process.env.NODE_ENV === 'production' && <Analytics />}

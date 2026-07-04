@@ -156,11 +156,16 @@ export async function createBooking(
       specialRequests,
       status: 'confirmed',
     });
+    const bookeddate=Date.now();
 
     await booking.save();
 
     // Update room status
     await Room.findByIdAndUpdate(roomId, { status: 'occupied' });
+    if(bookeddate - Date.now() > 30*60*1000){
+      await Booking.findByIdAndUpdate(booking._id, { status: 'cancelled' });
+      await Room.findByIdAndUpdate(roomId, { status: 'available' });
+    }
 
     // Send confirmation email
     await sendBookingConfirmation(guestEmail, guestName, {

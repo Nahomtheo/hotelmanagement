@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import RoomImageCard from '@/components/ui/imagecard';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function RoomsPage() {
   const { data: session, status } = useSession();
@@ -16,17 +17,17 @@ export default function RoomsPage() {
   const [checkOutDate, setCheckOutDate] = useState('');
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
-   const numberOfNights =
-  checkInDate && checkOutDate
-    ? Math.max(
-        0,
-        Math.ceil(
-          (new Date(checkOutDate).getTime() -
-            new Date(checkInDate).getTime()) /
-            (1000 * 60 * 60 * 24)
+
+  const numberOfNights =
+    checkInDate && checkOutDate
+      ? Math.max(
+          0,
+          Math.ceil(
+            (new Date(checkOutDate).getTime() - new Date(checkInDate).getTime()) /
+              (1000 * 60 * 60 * 24)
+          )
         )
-      )
-    : 0;
+      : 0;
 
   useEffect(() => {
     fetchRooms();
@@ -61,7 +62,6 @@ export default function RoomsPage() {
 
     const formData = new FormData(e.currentTarget);
 
-
     try {
       const res = await fetch('/api/bookings', {
         method: 'POST',
@@ -94,292 +94,261 @@ export default function RoomsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navbar */}
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/dashboard">
-            <h1 className="text-2xl font-bold text-blue-600 cursor-pointer">Hotel Booking</h1>
-          </Link>
-          {session?.user && (
-            <div className="flex gap-4">
-              <Link href="/dashboard">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">Dashboard</Button>
-              </Link>
+    <div className="relative min-h-screen text-zinc-100 overflow-hidden font-sans selection:bg-amber-500/30">
+      
+      {/* Immersive Ethiopian Highlands Sunset Background Overlay */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0 scale-105"
+        style={{
+          backgroundImage: `linear-gradient(to bottom, rgba(13, 13, 17, 0.65), rgba(13, 13, 17, 0.9)), url('https://images.unsplash.com/photo-1547153198-4c803cf86bf9?q=80&w=2000&auto=format&fit=crop')`,
+        }}
+      />
+
+      {/* Main Container */}
+      <div className="relative z-10 min-h-screen flex flex-col">
+        
+       
+
+        {/* Content Wrapper */}
+        <div className="max-w-7xl mx-auto px-6 py-16 w-full flex-1">
+          
+          {/* Header & Date Pickers */}
+          <div className="mb-12  flex flex-col md:flex-row md:items-center md:justify-between gap-6 mt-6">
+            <h2 className="text-3xl font-bold tracking-wide text-zinc-100 mb-6">Available Rooms</h2>
+            
+            <div className="grid md:grid-cols-2 gap-6 backdrop-blur-md bg-zinc-950/40 border border-white/[0.06] rounded-2xl p-6 shadow-xl">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-2.5">Check-in Date</label>
+                <input
+                  type="date"
+                  value={checkInDate}
+                  onChange={(e) => setCheckInDate(e.target.value)}
+                  className="w-full bg-zinc-900/60 border border-white/[0.08] text-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/50 transition [color-scheme:dark]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-2.5">Check-out Date</label>
+                <input
+                  type="date"
+                  value={checkOutDate}
+                  onChange={(e) => setCheckOutDate(e.target.value)}
+                  className="w-full bg-zinc-900/60 border border-white/[0.08] text-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/50 transition [color-scheme:dark]"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Rooms Display */}
+          {loading ? (
+            <div className="text-center py-24 text-zinc-400 font-light tracking-wide animate-pulse">
+              Curating available sanctuaries...
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {rooms.map((room: any) => (
+                <div key={room._id} className="backdrop-blur-md bg-zinc-950/40 border border-white/[0.06] hover:border-amber-500/30 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 flex flex-col group">
+                  <div className="relative h-60 overflow-hidden m-3 rounded-xl">
+                    {room.images && room.images.length > 0 ? (
+                      <RoomImageCard images={room.images} />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900">
+                        <span className="text-zinc-500 text-xs tracking-widest">NO IMAGE AVAILABLE</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="p-6 pt-3 flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-baseline justify-between mb-2">
+                        <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-amber-400 transition-colors">Room {room.roomNumber}</h3>
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border ${
+                          room.status === 'available' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                        }`}>
+                          {room.status}
+                        </span>
+                      </div>
+                      <p className="text-xs text-zinc-400 font-light capitalize mb-1">{room.type} Suite</p>
+                      <p className="text-xs text-zinc-500 font-light mb-6">Accommodates up to {room.maxGuests} Guests</p>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between items-baseline mb-4">
+                        <span className="text-zinc-400 text-xs font-light">Price per night</span>
+                        <span className="text-2xl font-bold text-amber-400">${room.pricePerNight}</span>
+                      </div>
+                      
+                      <Button
+                        onClick={() => handleBookRoom(room)}
+                        disabled={room.status !== 'available'}
+                        className="w-full bg-zinc-900/80 border border-white/[0.08] hover:bg-amber-500 hover:text-zinc-950 hover:border-transparent text-zinc-100 font-medium py-5 rounded-xl disabled:opacity-30 disabled:hover:bg-zinc-900/80 disabled:hover:text-zinc-100 transition-all duration-300"
+                      >
+                        Book Sanctuary
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
-      </nav>
+      </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Available Rooms</h1>
-          <div className="grid md:grid-cols-2 gap-4 bg-white rounded-lg shadow p-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Check-in Date</label>
-              <input
-                type="date"
-                value={checkInDate}
-                onChange={(e) => setCheckInDate(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Check-out Date</label>
-              <input
-                type="date"
-                value={checkOutDate}
-                onChange={(e) => setCheckOutDate(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-        </div>
-
-        {loading ? (
-          <p className="text-center text-gray-600">Loading rooms...</p>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {rooms.map((room: any) => (
-              <div key={room._id} className="bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden">
-               <div className="relative h-64 overflow-hidden rounded-2xl">
-                {room.images && room.images.length > 0 ? (
-                    <RoomImageCard images={room.images} />
-                  ) : (
-                   <div className="flex h-full items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-600">
-                     <div className="text-5xl">🏨</div>
-                   </div>
-                  )}
+      {/* Booking Modal Glassmorphism Refined */}
+      <AnimatePresence>
+        {showBookingForm && selectedRoom && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-zinc-950/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 15 }}
+              className="w-full max-w-2xl bg-zinc-900/90 border border-white/[0.08] rounded-3xl shadow-2xl max-h-[90vh] flex flex-col overflow-hidden"
+            >
+              {/* Modal Header */}
+              <div className="border-b border-white/[0.06] bg-zinc-950/40 px-8 py-5 flex justify-between items-center">
+                <div>
+                  <h2 className="text-xl font-bold tracking-wide text-zinc-100">Reserve Room {selectedRoom?.roomNumber}</h2>
+                  <p className="text-xs text-zinc-400 font-light mt-0.5">Provide details to secure your accommodation parameters.</p>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Room {room.roomNumber}</h3>
-                  <p className="text-sm text-gray-600 mb-2 capitalize">{room.type} Room</p>
-                  <p className="text-sm text-gray-600 mb-4">Max Guests: {room.maxGuests}</p>
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-2xl font-bold text-blue-600">${room.pricePerNight}</span>
-                    <span className={`px-3 py-1 rounded text-sm font-semibold ${
-                      room.status === 'available' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                    }`}>
-                      {room.status}
-                    </span>
-                  </div>
-                  <Button
-                    onClick={() => handleBookRoom(room)}
-                    disabled={room.status !== 'available'}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
-                  >
-                    Book Now
-                  </Button>
-                </div>
+                <button 
+                  onClick={() => { setShowBookingForm(false); setSelectedRoom(null); }}
+                  className="text-zinc-400 hover:text-zinc-200 text-sm p-1.5 rounded-lg border border-white/[0.04] hover:bg-white/[0.04] transition-colors"
+                >
+                  ✕
+                </button>
               </div>
-            ))}
-          </div>
+
+              {/* Scrollable Form Body */}
+              <div className="overflow-y-auto p-8 space-y-6">
+                
+                {/* Embedded dynamic summary */}
+                <div className="rounded-xl bg-zinc-950/50 border border-white/[0.04] p-4 flex justify-between items-center">
+                  <div>
+                    <span className="text-[10px] tracking-widest text-zinc-500 uppercase block font-semibold">Selected Suite</span>
+                    <span className="text-sm font-medium capitalize text-zinc-200">{selectedRoom.type} Room</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] tracking-widest text-zinc-500 uppercase block font-semibold">Rate</span>
+                    <span className="text-lg font-bold text-amber-400">${selectedRoom.pricePerNight} <span className="text-xs text-zinc-400 font-light">/ night</span></span>
+                  </div>
+                </div>
+
+                <form onSubmit={handleSubmitBooking} className="space-y-5">
+                  <div>
+                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">Guest Name</label>
+                    <input
+                      type="text"
+                      name="guestName"
+                      required
+                      className="w-full bg-zinc-950/40 border border-white/[0.08] text-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/40 transition"
+                    />
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">Email Address</label>
+                      <input
+                        type="email"
+                        name="guestEmail"
+                        required
+                        className="w-full bg-zinc-950/40 border border-white/[0.08] text-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/40 transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">Phone Number</label>
+                      <input
+                        type="tel"
+                        name="guestPhone"
+                        required
+                        className="w-full bg-zinc-950/40 border border-white/[0.08] text-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/40 transition"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">Check-In</label>
+                      <input
+                        type="date"
+                        name="checkIn"
+                        required
+                        value={checkInDate}
+                        min={new Date().toISOString().split("T")[0]}
+                        onChange={(e) => setCheckInDate(e.target.value)}
+                        className="w-full bg-zinc-950/40 border border-white/[0.08] text-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/40 transition [color-scheme:dark]"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">Check-Out</label>
+                      <input
+                        type="date"
+                        name="checkOut"
+                        required
+                        value={checkOutDate}
+                        onChange={(e) => setCheckOutDate(e.target.value)}
+                        className="w-full bg-zinc-950/40 border border-white/[0.08] text-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/40 transition [color-scheme:dark]"
+                      />
+                    </div>
+                  </div>
+
+                  {numberOfNights > 0 && (
+                    <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.02] flex justify-between items-center">
+                      <span className="text-xs text-zinc-400 font-light">Duration metrics: <strong className="text-zinc-200 font-normal">{numberOfNights} Nights</strong></span>
+                      <span className="text-md font-semibold text-emerald-400">Total: ${numberOfNights * selectedRoom.pricePerNight}</span>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">Number of Guests</label>
+                    <input
+                      type="number"
+                      name="numberOfGuests"
+                      min="1"
+                      max={selectedRoom.maxGuests}
+                      required
+                      className="w-full bg-zinc-950/40 border border-white/[0.08] text-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/40 transition"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">Special Requests</label>
+                    <textarea
+                      name="specialRequests"
+                      rows={3}
+                      placeholder="Airport arrangements, dynamic culinary requests..."
+                      className="w-full bg-zinc-950/40 border border-white/[0.08] text-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/40 transition resize-none placeholder:text-zinc-600"
+                    />
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-4 pt-4 border-t border-white/[0.06]">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowBookingForm(false);
+                        setSelectedRoom(null);
+                      }}
+                      className="flex-1 rounded-xl border border-white/[0.08] py-3 text-sm text-zinc-300 font-medium hover:bg-white/[0.04] transition"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 rounded-xl bg-amber-500 text-zinc-950 font-semibold py-3 text-sm shadow-xl shadow-amber-500/5 hover:bg-amber-400 transition"
+                    >
+                      Confirm Reservation
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
-      </div>
-
-      {/* Booking Modal */}
-      {showBookingForm && selectedRoom && (
- <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm">
-  <div className="flex min-h-screen items-center justify-center p-4">
-    <div className="flex max-h-[90vh] w-full max-w-2xl flex-col rounded-3xl bg-white shadow-2xl">
-
-     
-    {/* Header */}
-     <div className="sticky top-0 z-10 rounded-t-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-8 py-6 text-white">
-        
-    <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-8 py-6 text-white">
-      <h2 className="text-3xl font-bold">
-        Reserve Room {selectedRoom?.roomNumber}
-      </h2>
-
-      <p className="mt-1 text-slate-300">
-        Complete your reservation details
-      </p>
-    </div>
-    </div>
-<div className="overflow-y-auto p-8">
-    <form
-      onSubmit={handleSubmitBooking}
-      className="space-y-6 p-8"
-    >
-
-      {/* Room Summary */}
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-slate-500">
-              Room Type
-            </p>
-
-            <p className="font-semibold capitalize">
-              {selectedRoom.type}
-            </p>
-          </div>
-
-          <div className="text-right">
-            <p className="text-sm text-slate-500">
-              Per Night
-            </p>
-
-            <p className="text-xl font-bold text-emerald-600">
-              ${selectedRoom.pricePerNight}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Guest Name */}
-      <div>
-        <label className="mb-2 block text-sm font-medium text-slate-700">
-          Guest Name
-        </label>
-
-        <input
-          type="text"
-          name="guestName"
-          required
-          className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
-        />
-      </div>
-
-      {/* Email + Phone */}
-      <div className="grid gap-4 md:grid-cols-2">
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
-            Email
-          </label>
-
-          <input
-            type="email"
-            name="guestEmail"
-            required
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
-          />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
-            Phone
-          </label>
-
-          <input
-            type="tel"
-            name="guestPhone"
-            required
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
-          />
-        </div>
-
-      </div>
-
-      {/* Check In / Check Out */}
-      <div className="grid gap-4 md:grid-cols-2">
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
-            Check-In Date
-          </label>
-
-          <input
-            type="date"
-            name="checkIn"
-            required
-            min={new Date().toISOString().split("T")[0]}
-            onChange={(e) => setCheckInDate(e.target.value)}
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
-          />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
-            Check-Out Date
-          </label>
-
-          <input
-            type="date"
-            name="checkOut"
-            required
-            onChange={(e) => setCheckOutDate(e.target.value)}
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
-          />
-        </div>
-        {numberOfNights > 0 && (
-          <div className="md:col-span-2">
-            <p className="text-sm text-slate-500">
-              Total Nights: {numberOfNights}
-            </p>
-            <p className="text-lg font-semibold text-emerald-600">
-              Total Price: ${numberOfNights * selectedRoom.pricePerNight}
-            </p>
-          </div>
-        )}
-
-      </div>
-
-      {/* Guests */}
-      <div>
-        <label className="mb-2 block text-sm font-medium text-slate-700">
-          Number of Guests
-        </label>
-
-        <input
-          type="number"
-          name="numberOfGuests"
-          min="1"
-          max={selectedRoom.maxGuests}
-          required
-          className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
-        />
-      </div>
-
-      {/* Special Requests */}
-      <div>
-        <label className="mb-2 block text-sm font-medium text-slate-700">
-          Special Requests
-        </label>
-
-        <textarea
-          name="specialRequests"
-          rows={4}
-          placeholder="Airport pickup, late check-in, extra pillows..."
-          className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
-        />
-      </div>
-
-      {/* Actions */}
-      <div className="flex gap-4 pt-2">
-
-        <button
-          type="button"
-          onClick={() => {
-            setShowBookingForm(false);
-            setSelectedRoom(null);
-          }}
-          className="flex-1 rounded-xl border border-slate-300 py-3 font-medium text-slate-700 transition hover:bg-slate-100"
-        >
-          Cancel
-        </button>
-
-        <button
-          type="submit"
-          className="flex-1 rounded-xl bg-gradient-to-r from-slate-900 to-slate-700 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.02]"
-        >
-          Confirm Reservation
-        </button>
-
-      </div>
-
-    </form>
-    </div>
-
-    
-  </div>
-</div>
-</div>
-      )}
-
+      </AnimatePresence>
     </div>
   );
 }

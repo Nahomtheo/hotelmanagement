@@ -3,13 +3,13 @@ import { getServerSession } from 'next-auth';
 import { connectDB } from '@/lib/mongodb';
 import User from '@/lib/mongodb/models/User';
 import { errorResponse, successResponse } from '@/lib/utils/errorHandler';
-import { authOptions } from '../../[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.id) {
+    if (!(session?.user as any)?.id) {
       return NextResponse.json(
         errorResponse('Unauthorized'),
         { status: 401 }
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
     await connectDB();
 
-    const user = await User.findById(session.user.id).select('-password');
+    const user = await User.findById((session?.user as any).id).select('-password');
 
     if (!user || user.isDeleted) {
       return NextResponse.json(
@@ -51,7 +51,7 @@ export async function PUT(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.id) {
+    if (!(session?.user as any)?.id) {
       return NextResponse.json(
         errorResponse('Unauthorized'),
         { status: 401 }
@@ -64,7 +64,7 @@ export async function PUT(req: NextRequest) {
     await connectDB();
 
     const user = await User.findByIdAndUpdate(
-      session.user.id,
+      (session?.user as any).id,
       {
         firstName,
         lastName,

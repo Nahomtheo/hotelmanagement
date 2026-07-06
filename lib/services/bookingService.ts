@@ -154,18 +154,16 @@ export async function createBooking(
       pricePerNight: room.pricePerNight,
       totalPrice,
       specialRequests,
-      status: 'confirmed',
+      status: 'pending',
     });
-    const bookeddate=Date.now();
+  
 
     await booking.save();
+   
 
     // Update room status
     await Room.findByIdAndUpdate(roomId, { status: 'occupied' });
-    if(bookeddate - Date.now() > 30*60*1000){
-      await Booking.findByIdAndUpdate(booking._id, { status: 'cancelled' });
-      await Room.findByIdAndUpdate(roomId, { status: 'available' });
-    }
+  
 
     // Send confirmation email
     await sendBookingConfirmation(guestEmail, guestName, {
@@ -193,9 +191,9 @@ export async function createBooking(
 }
 
 /**
- * Cancel booking
+ * Cancel or confirm booking
  */
-export async function cancelBooking(bookingId: string): Promise<IBooking> {
+export async function cancelorconfirmBooking(bookingId: string, action: 'confirm' | 'cancel'): Promise<IBooking> {
   try {
     await connectDB();
 
@@ -204,12 +202,27 @@ export async function cancelBooking(bookingId: string): Promise<IBooking> {
       throw new Error('Booking not found');
     }
 
-    if (booking.status === 'cancelled') {
-      throw new Error('Booking is already cancelled');
+    if (action === 'confirm') {
+      if (booking.status !== 'pending') {
+        throw new Error('Only pending bookings can be confirmed');
+      }
+      booking.status = 'confirmed';
+    } else if (action === 'cancel') {
+      if (booking.status === 'cancelled') {
+        throw new Error('Booking is already cancelled');
+      }
+      if (booking.status === 'checked_in') {
+        throw new Error('Cannot cancel a checked-in booking');
+      }
+      if (booking.status === 'checked_out') {
+        throw new Error('Cannot cancel a checked-out booking');
+      }
+      booking.status = 'cancelled';
+    } else {
+      throw new Error('Invalid action');
     }
-
     // Update booking status
-    booking.status = 'cancelled';
+    
     await booking.save();
 
     // Update room status back to available
@@ -252,6 +265,7 @@ export async function checkInGuest(bookingId: string): Promise<IBooking> {
 
     booking.status = 'checked_in';
     await booking.save();
+    await Room.findByIdAndUpdate(booking.roomId, { status: 'occupied' });
 
     return booking;
   } catch (error) {

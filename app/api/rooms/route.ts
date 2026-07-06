@@ -6,6 +6,7 @@ import Hotel from '@/lib/mongodb/models/Hotel';
 import { errorResponse, successResponse } from '@/lib/utils/errorHandler';
 import { roomCreationSchema } from '@/lib/validations';
 import { authOptions } from '@/lib/auth';
+import Booking from '@/lib/mongodb/models/Booking';
 
 export async function GET(req: NextRequest) {
   try {
@@ -38,6 +39,17 @@ export async function GET(req: NextRequest) {
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
+      const expiredTime = new Date(Date.now() - 90 * 60 * 1000); // 90 minutes ago
+  
+    const expiredBookings = await Booking.find({
+     isDeleted: false,
+     status: "pending",
+     createdAt: { $lt: expiredTime },
+});
+  await Promise.all(expiredBookings.map(async (booking) => {
+    await Booking.findByIdAndUpdate(booking._id, { status: 'cancelled' });
+    await Room.findByIdAndUpdate(booking.roomId, { status: 'available' });
+  }));
 
     const total = await Room.countDocuments(query);
 

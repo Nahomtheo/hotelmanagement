@@ -6,6 +6,7 @@ import { errorResponse, successResponse } from '@/lib/utils/errorHandler';
 import { bookingValidationSchema } from '@/lib/validations';
 import { createBooking, checkInGuest, checkOutGuest } from '@/lib/services/bookingService';
 import { authOptions } from '@/lib/auth';
+import Room from '@/lib/mongodb/models/Room';
 
 export async function GET(req: NextRequest) {
   try {
@@ -25,18 +26,21 @@ export async function GET(req: NextRequest) {
     await connectDB();
 
     let query: any = { isDeleted: false };
+   
 
     // Customers can only see their bookings
     if ((session?.user as any)?.role === 'customer') {
       query.userId = (session?.user as any)?.id;
     }
-
-    const skip = (page - 1) * limit;
+      const skip = (page - 1) * limit;
+    
     const bookings = await Booking.find(query)
       .skip(skip)
       .limit(limit)
       .populate('roomId')
       .sort({ createdAt: -1 });
+
+ 
 
     const total = await Booking.countDocuments(query);
 

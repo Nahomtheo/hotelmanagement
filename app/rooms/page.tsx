@@ -168,7 +168,8 @@ export default function RoomsPage() {
                         </span>
                       </div>
                       <p className="text-xs text-zinc-400 font-light capitalize mb-1">{room.type} Suite</p>
-                      <p className="text-xs text-zinc-500 font-light mb-6">Accommodates up to {room.maxGuests} Guests</p>
+                      <p className="text-xs text-zinc-500 font-light mb-2">Accommodates up to {room.maxGuests} Guests</p>
+                      <p className="text-sm text-zinc-400 font-light mb-2">{room.description || "No description available for this room."}</p>
                     </div>
 
                     <div>
@@ -176,6 +177,8 @@ export default function RoomsPage() {
                         <span className="text-zinc-400 text-xs font-light">Price per night</span>
                         <span className="text-2xl font-bold text-amber-400">${room.pricePerNight}</span>
                       </div>
+                      
+                     
                       
                       <Button
                         onClick={() => handleBookRoom(room)}

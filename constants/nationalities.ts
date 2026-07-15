@@ -1,0 +1,32 @@
+// src/constants/nationalities.ts
+
+export const NATIONALITIES = [
+  'Afghan', 'Albanian', 'Algerian', 'American', 'Andorran', 'Angolan', 
+  'Argentine', 'Armenian', 'Australian', 'Austrian', 'Azerbaijani',
+  'Bahamian', 'Bahraini', 'Bangladeshi', 'Barbadian', 'Belarusian', 
+  'Belgian', 'Belizean', 'Beninese', 'Bhutanese', 'Bolivian', 
+  'Bosnian', 'Brazilian', 'British', 'Bruneian', 'Bulgarian', 
+  'Burkinabe', 'Burmese', 'Burundian', 'Cambodian', 'Cameroonian', 
+  'Canadian', 'Cape Verdean', 'Chadian', 'Chilean', 'Chinese', 
+  'Colombian', 'Comoran', 'Congolese', 'Costa Rican', 'Croatian', 
+  'Cuban', 'Cypriot', 'Czech', 'Danish', 'Djiboutian', 'Dominican', 
+  'Dutch', 'East Timorese', 'Ecuadorian', 'Egyptian', 'Emirati', 
+  'Equatoguinean', 'Eritrean', 'Estonian', 'Ethiopian', 'Fijian', 
+  'Filipino', 'Finnish', 'French', 'Gabonese', 'Gambian', 'Georgian', 
+  'German', 'Ghanaian', 'Greek', 'Grenadian', 'Guatemalan', 'Guinean', 
+  'Guyanese', 'Haitian', 'Honduran', 'Hungarian', 'Icelandic', 
+  'Indian', 'Indonesian', 'Iranian', 'Iraqi', 'Irish', 'Israeli', 
+  'Italian', 'Ivory Coast', 'Jamaican', 'Japanese', 'Jordanian', 
+  'Kazakh', 'Kenyan', 'Kuwaiti', 'Lebanese', 'Liberian', 'Libyan', 
+  'Malaysian', 'Maldivian', 'Malian', 'Maltese', 'Mauritanian', 
+  'Mauritian', 'Mexican', 'Moroccan', 'Mozambican', 'Namibian', 
+  'Nepalese', 'New Zealander', 'Nicaraguan', 'Nigerian', 'Norwegian', 
+  'Omani', 'Pakistani', 'Panamanian', 'Paraguayan', 'Peruvian', 
+  'Polish', 'Portuguese', 'Qatari', 'Romanian', 'Russian', 'Rwandan', 
+  'Saudi', 'Senegalese', 'Serbian', 'Singaporean', 'Slovak', 'Slovenian', 
+  'Somali', 'South African', 'South Korean', 'Spanish', 'Sri Lankan', 
+  'Sudanese', 'Swedish', 'Swiss', 'Syrian', 'Taiwanese', 'Tanzanian', 
+  'Thai', 'Togolese', 'Tunisian', 'Turkish', 'Ugandan', 'Ukrainian', 
+  'Uruguayan', 'Uzbek', 'Venezuelan', 'Vietnamese', 'Yemeni', 'Zambian', 
+  'Zimbabwean', 'Other'
+];

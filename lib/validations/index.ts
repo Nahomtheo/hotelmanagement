@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { NATIONALITIES } from '@/constants/nationalities';
 
 export const userRegistrationSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -18,12 +19,17 @@ export const bookingValidationSchema = z.object({
   guestName: z.string().min(2, 'Guest name is required'),
   guestEmail: z.string().email('Invalid email'),
   guestPhone: z.string().min(10, 'Phone number is required'),
+  nationality: z.string().min(1, 'Please select a nationality'),
+
+  reasonOfStay: z.string().min(4,'please write your reason of stay'),
   checkInDate: z.string().refine((date) => new Date(date) > new Date(), {
     message: 'Check-in date must be in the future',
   }),
   checkOutDate: z.string(),
   numberOfGuests: z.number().min(1, 'At least one guest is required'),
   specialRequests: z.string().optional(),
+    passport_no : z.string().optional(),
+  id_no : z.string().optional(),
 });
 
 export const roomCreationSchema = z.object({

@@ -107,10 +107,14 @@ export async function createBooking(
   guestName: string,
   guestEmail: string,
   guestPhone: string,
+  nationality:string,
+  reasonOfStay:string,
   checkInDate: Date,
   checkOutDate: Date,
   numberOfGuests: number,
-  specialRequests?: string
+  specialRequests?: string,
+  passport_no?:string,
+  id_no?:string,
 ): Promise<IBooking> {
   try {
     await connectDB();
@@ -147,6 +151,10 @@ export async function createBooking(
       guestName,
       guestEmail,
       guestPhone,
+      nationality,
+      passport_no,
+      id_no,
+      reasonOfStay,
       checkInDate,
       checkOutDate,
       numberOfGuests,

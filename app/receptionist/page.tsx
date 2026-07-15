@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+
 import { 
   CheckCircle2, 
   LogOut, 
@@ -13,14 +14,18 @@ import {
   Check, 
   X, 
   MessageSquare,
-  ShieldCheck
+  ShieldCheck,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react';
+import PoliceReport from '@/components/PoliceReport';
 
 export default function ReceptionistPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showPReport, setShowPReport] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -32,11 +37,7 @@ export default function ReceptionistPage() {
     }
   }, [status, session, router]);
 
-  useEffect(() => {
-    if ((session?.user as any)?.id) {
-      fetchBookings();
-    }
-  }, [session]);
+
 
   const fetchBookings = async () => {
     try {
@@ -51,6 +52,11 @@ export default function ReceptionistPage() {
       setLoading(false);
     }
   };
+    useEffect(() => {
+    if ((session?.user as any)?.id) {
+      fetchBookings();
+    }
+  }, [session]);
 
   const handleAction = async (bookingId: string, type: 'check-in' | 'check-out') => {
     try {
@@ -158,22 +164,48 @@ export default function ReceptionistPage() {
           </div>
 
           <div className="group bg-[#0c0c0e] border border-zinc-800/80 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:border-amber-500/30 hover:shadow-amber-500/[0.02]">
-            <div className="flex items-center justify-between">
-              <div className="bg-amber-500/10 text-amber-400 p-4 rounded-xl border border-amber-500/20 group-hover:scale-105 transition-transform">
-                <DoorOpen className="w-6 h-6" />
-              </div>
-              <span className="text-[10px] font-bold tracking-wider uppercase text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-full">
-                Live Status
-              </span>
-            </div>
+           
             <h3 className="text-lg font-bold text-zinc-100 mt-5 mb-1.5 tracking-tight group-hover:text-amber-300 transition-colors">
               Manage Departures
             </h3>
             <p className="text-sm text-zinc-400 leading-relaxed">
               Finalize statement folios, log incidentals, and transition rooms back to structural priority.
             </p>
+
           </div>
+          <div className="group bg-[#0c0c0e] border border-zinc-800/80 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:border-amber-500/30 hover:shadow-amber-500/[0.02]">
+            <div className="flex items-center justify-between">
+              <div className="bg-amber-500/10 text-amber-400 p-4 rounded-xl border border-amber-500/20 group-hover:scale-105 transition-transform">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <span className="text-[10px] font-bold tracking-wider uppercase text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-full">
+                Live Status
+              </span>
+            </div>
+            <h3 className="text-lg font-bold text-zinc-100 mt-5 mb-1.5 tracking-tight group-hover:text-amber-300 transition-colors">
+              Generate Police Report
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Compile a comprehensive police report of all current guests, including their personal details and stay information, for law enforcement verification.
+            </p>
+               <div className="bg-white rounded-xl shadow overflow-hidden">
+          <button
+            onClick={() => setShowPReport(!showPReport)}
+            className="w-full flex items-center justify-between p-5 text-xl font-semibold text-gray-800 hover:bg-gray-50 transition"
+          >
+            <span>Generate Police Report</span>
+            {showPReport ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            
+          </button>
+          </div>
+        
+            </div>
         </div>
+            {showPReport && (
+              <div className="p-6 border-t bg-white">
+                <PoliceReport guests={bookings} />
+              </div>
+            )}
 
         {/* Schedule Console */}
         <div className="bg-[#0c0c0e] border border-zinc-800/80 rounded-2xl shadow-2xl overflow-hidden">
@@ -279,27 +311,58 @@ export default function ReceptionistPage() {
                           </Button>
                         </div>
                       </td>
-                      <td className="py-4 px-6 text-right">
-                        {booking.status === 'confirmed' && (
-                          <Button
-                            onClick={() => handleAction(booking._id, 'check-in')}
-                            className="bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-zinc-950 text-xs font-bold h-8 px-4 rounded-lg shadow-md transition-all duration-200"
-                          >
-                            Check In
-                          </Button>
-                        )}
-                        {booking.status === 'checked_in' && (
-                          <Button
-                            onClick={() => handleAction(booking._id, 'check-out')}
-                            className="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-zinc-700 text-xs font-bold h-8 px-4 rounded-lg shadow-md transition-all duration-200"
-                          >
-                            Check Out
-                          </Button>
-                        )}
-                        {booking.status !== 'confirmed' && booking.status !== 'checked_in' && (
-                          <span className="text-xs font-medium text-zinc-600 pr-2">Archived</span>
-                        )}
-                      </td>
+                     <td className="py-4 px-6 text-right">
+  {booking.status === "confirmed" && (
+    <Button
+      onClick={() => handleAction(booking._id, "check-in")}
+      className="bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-zinc-950 text-xs font-bold h-8 px-4 rounded-lg shadow-md transition-all duration-200"
+    >
+      Check In
+    </Button>
+  )}
+
+  {booking.status === "checked_in" && (
+    <div className="flex flex-col items-end gap-2">
+      <span className="text-xs text-emerald-400">
+        Checked in by: {booking.checkedInBy?.firstName || booking.checkedInBy?.name || "Unknown"}
+      </span>
+
+      <Button
+        onClick={() => handleAction(booking._id, "check-out")}
+        className="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-zinc-700 text-xs font-bold h-8 px-4 rounded-lg shadow-md shadow-md transition-all duration-200"
+      >
+        Check Out
+      </Button>
+    </div>
+  )}
+
+  {booking.status === "checked_out" && (
+    <div className="flex flex-col items-end gap-1">
+      <span className="text-xs text-emerald-400">
+        Checked in by: {booking.checkedInBy?.firstName || booking.checkedInBy?.name || "Unknown"}
+      </span>
+
+      <span className="text-xs text-sky-400">
+        Checked out by: {booking.checkedOutBy?.firstName || booking.checkedOutBy?.name || "Unknown"}
+      </span>
+       <span className="text-xs text-sky-400">
+        Confirmed by : {booking.confirmedBy?.firstName || booking.checkedOutBy?.name || "Unknown"}
+      </span>
+    </div>
+  )}
+
+  {booking.status === "cancelled" && (
+    <span className="text-xs text-rose-400">
+      Cancelled by: {booking.cancelledBy?.firstName || booking.cancelledBy?.name || "Unknown"}
+    </span>
+  )}
+
+  {booking.status === "pending" && (
+    <span className="text-xs text-yellow-400">
+      Waiting for approval
+    </span>
+  )}
+</td>
                     </tr>
                   ))}
                 </tbody>

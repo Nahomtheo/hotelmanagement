@@ -1,5 +1,5 @@
 'use client';
-
+import { NATIONALITIES } from '@/constants/nationalities';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -71,10 +71,14 @@ export default function RoomsPage() {
           guestName: formData.get('guestName'),
           guestEmail: formData.get('guestEmail'),
           guestPhone: formData.get('guestPhone'),
+          nationality:formData.get('nationality'),
+          reasonOfStay:formData.get ('reasonOfStay'),
           checkInDate: new Date(checkInDate),
           checkOutDate: new Date(checkOutDate),
           numberOfGuests: parseInt(formData.get('numberOfGuests') as string),
           specialRequests: formData.get('specialRequests'),
+          passport_no:formData.get('passportno'),
+          id_no:formData.get('idnumber')
         }),
       });
 
@@ -271,6 +275,22 @@ export default function RoomsPage() {
                       />
                     </div>
                   </div>
+                  <label htmlFor="nationality" className="text-xs font-bold uppercase mb-1">
+        Nationality
+      </label>
+      
+      <select
+        id="nationality"
+        name="nationality"
+        className="border p-2 rounded max-h-40 overflow-y-auto bg-white text-black"
+      >
+        <option value="">-- Select Nationality --</option>
+        {NATIONALITIES.map((country) => (
+          <option key={country} value={country}>
+            {country}
+          </option>
+        ))}
+      </select>
 
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
@@ -315,6 +335,33 @@ export default function RoomsPage() {
                       required
                       className="w-full bg-zinc-950/40 border border-white/[0.08] text-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/40 transition"
                     />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">reason of stay</label>
+                    <input
+                      type='text'
+                      name='reasonOfStay'
+                      required
+                      className="w-full bg-zinc-950/40 border border-white/[0.08] text-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/40 transition"
+                      />
+                  </div>
+                   <div>
+                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">passport number</label>
+                    <input
+                      type='text'
+                      name='passportno'
+                      
+                      className="w-full bg-zinc-950/40 border border-white/[0.08] text-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/40 transition"
+                      />
+                  </div>
+                   <div>
+                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">ID number</label>
+                    <input
+                      type='text'
+                      name='idnumber'
+                     
+                      className="w-full bg-zinc-950/40 border border-white/[0.08] text-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/40 transition"
+                      />
                   </div>
 
                   <div>

@@ -3,6 +3,9 @@ import { authOptions } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { errorResponse } from "@/lib/utils/errorHandler";
+import mongoose from "mongoose";
+import Booking from "@/lib/mongodb/models/Booking";
+import User from "@/lib/mongodb/models/User";
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -28,12 +31,14 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
     if (isConfirm) {
       const confirmedBooking = await cancelorconfirmBooking(bookingId, 'confirm');
+      await Booking.findByIdAndUpdate(bookingId, { confirmedBy: new mongoose.Types.ObjectId((session?.user as any)?.id) });
       return NextResponse.json(
         { success: true, message: 'Booking updated successfully', data: confirmedBooking }
       );
     }
     if (isCancel) {
       const cancelledBooking = await cancelorconfirmBooking(bookingId, 'cancel');
+      await Booking.findByIdAndUpdate(bookingId, { cancelledBy: new mongoose.Types.ObjectId((session?.user as any)?.id) });
       return NextResponse.json(
         { success: true, message: 'Booking updated successfully', data: cancelledBooking }
       );

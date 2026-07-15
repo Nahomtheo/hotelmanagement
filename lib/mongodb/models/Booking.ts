@@ -14,6 +14,17 @@ export interface IBooking extends Document {
   totalPrice: number;
   status: 'pending' | 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled';
   paymentStatus: 'unpaid' | 'paid' | 'refunded';
+  confirmedBy?: mongoose.Types.ObjectId;
+  checkedInBy?: mongoose.Types.ObjectId;
+  checkedOutBy?: mongoose.Types.ObjectId;
+  cancelledBy?: mongoose.Types.ObjectId;
+
+  nationality?:string;
+
+  passport_no?:string;
+  id_no?:string;
+  reasonOfStay?:string;
+
   specialRequests: string;
   isDeleted: boolean;
   createdAt: Date;
@@ -86,11 +97,41 @@ const bookingSchema = new Schema<IBooking>(
       default: 'pending',
       index: true,
     },
+    confirmedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    checkedInBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    checkedOutBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    cancelledBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
     paymentStatus: {
       type: String,
       enum: ['unpaid', 'paid', 'refunded'],
       default: 'unpaid',
     },
+    nationality:{
+      type:String
+    },
+    passport_no:{
+      type:String
+    },
+   
+    id_no:{
+      type:String
+    },
+    reasonOfStay:{
+      type:String
+    },
+
     specialRequests: {
       type: String,
       trim: true,
@@ -100,6 +141,8 @@ const bookingSchema = new Schema<IBooking>(
       default: false,
       index: true,
     },
+
+   
   },
   { timestamps: true }
 );

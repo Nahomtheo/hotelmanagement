@@ -38,6 +38,11 @@ export async function GET(req: NextRequest) {
       .skip(skip)
       .limit(limit)
       .populate('roomId')
+      .populate('userId')
+      .populate("cancelledBy", "firstName email")
+      .populate("checkedInBy", "firstName email")
+      .populate("checkedOutBy", "firstName email")
+      .populate("confirmedBy", "firstName email")
       .sort({ createdAt: -1 });
 
  
@@ -92,23 +97,43 @@ export async function POST(req: NextRequest) {
       guestName,
       guestEmail,
       guestPhone,
+       nationality,
+      reasonOfStay,
       checkInDate,
       checkOutDate,
       numberOfGuests,
       specialRequests,
+       passport_no,
+      id_no,
     } = validation.data;
-
-    // Create booking
-    const booking = await createBooking(
-      roomId,
-      (session?.user as any)?.id,
+    console.log("validation,", roomId,
       guestName,
       guestEmail,
       guestPhone,
-      new Date(checkInDate),
-      new Date(checkOutDate),
+       nationality,
+      reasonOfStay,
+      checkInDate,
+      checkOutDate,
       numberOfGuests,
-      specialRequests
+      specialRequests,
+       passport_no,
+      id_no,)
+
+    // Create booking
+    const booking = await createBooking(
+      body.roomId,
+      (session?.user as any)?.id,
+      body.guestName,
+      body.guestEmail,
+      body.guestPhone,
+      body.nationality,
+      body.reasonOfStay,
+      new Date(body.checkInDate),
+      new Date(body.checkOutDate),
+      body.numberOfGuests,
+      body.specialRequests,
+      body.passport_no ,
+      body.id_no ,
     );
 
     return NextResponse.json(

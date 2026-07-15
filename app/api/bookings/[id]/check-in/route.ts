@@ -3,6 +3,9 @@ import { getServerSession } from 'next-auth';
 import { errorResponse, successResponse } from '@/lib/utils/errorHandler';
 import { checkInGuest, checkOutGuest } from '@/lib/services/bookingService';
 import { authOptions } from '@/lib/auth';
+import mongoose from 'mongoose';
+import Booking from '@/lib/mongodb/models/Booking';
+import User from '@/lib/mongodb/models/User';
 
 // Check-in
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
@@ -26,11 +29,13 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     if (isCheckIn) {
       const booking = await checkInGuest(bookingId);
+      await Booking.findByIdAndUpdate(bookingId, { checkedInBy: new mongoose.Types.ObjectId((session?.user as any)?.id) });
       return NextResponse.json(
         successResponse(booking, 'Guest checked in successfully')
       );
     } else {
       const booking = await checkOutGuest(bookingId);
+      await Booking.findByIdAndUpdate(bookingId, { checkedOutBy: new mongoose.Types.ObjectId((session?.user as any)?.id) }).populate;
       return NextResponse.json(
         successResponse(booking, 'Guest checked out successfully')
       );

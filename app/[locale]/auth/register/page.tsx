@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const t = useTranslations('auth');
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -29,7 +31,7 @@ export default function RegisterPage() {
     setSuccess('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('register.errors.passwordMismatch'));
       return;
     }
 
@@ -51,14 +53,14 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || 'Registration failed');
+        setError(data.message || t('register.errors.registrationFailed'));
         return;
       }
 
-      setSuccess('Registration successful! Please check your email to verify your account.');
+      setSuccess(t('register.success'));
       setTimeout(() => router.push('/auth/login'), 2000);
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(t('register.errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -67,8 +69,8 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">Create Account</h1>
-        <p className="text-center text-gray-600 mb-8">Join us for a better booking experience</p>
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">{t('register.title')}</h1>
+        <p className="text-center text-gray-600 mb-8">{t('register.subtitle')}</p>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
@@ -85,7 +87,7 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('register.firstName')}</label>
               <input
                 type="text"
                 name="firstName"
@@ -96,7 +98,7 @@ export default function RegisterPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('register.lastName')}</label>
               <input
                 type="text"
                 name="lastName"
@@ -109,7 +111,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('register.email')}</label>
             <input
               type="email"
               name="email"
@@ -117,12 +119,12 @@ export default function RegisterPage() {
               onChange={handleChange}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="you@example.com"
+              placeholder={t('register.emailPlaceholder')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('register.phone')}</label>
             <input
               type="tel"
               name="phone"
@@ -130,12 +132,12 @@ export default function RegisterPage() {
               onChange={handleChange}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="+1 (555) 000-0000"
+              placeholder={t('register.phonePlaceholder')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('register.password')}</label>
             <input
               type="password"
               name="password"
@@ -143,12 +145,12 @@ export default function RegisterPage() {
               onChange={handleChange}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="••••••••"
+              placeholder={t('register.passwordPlaceholder')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('register.confirmPassword')}</label>
             <input
               type="password"
               name="confirmPassword"
@@ -156,7 +158,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="••••••••"
+              placeholder={t('register.passwordPlaceholder')}
             />
           </div>
 
@@ -165,14 +167,14 @@ export default function RegisterPage() {
             disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition"
           >
-            {loading ? 'Creating account...' : 'Create Account'}
+            {loading ? t('register.submitLoading') : t('register.submit')}
           </Button>
         </form>
 
         <p className="text-sm text-gray-600 text-center mt-6">
-          Already have an account?{' '}
+          {t('register.haveAccount')}{' '}
           <Link href="/auth/login" className="text-blue-600 hover:underline">
-            Sign in
+            {t('register.signInLink')}
           </Link>
         </p>
       </div>

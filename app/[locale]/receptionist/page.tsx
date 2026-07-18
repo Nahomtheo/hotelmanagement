@@ -19,10 +19,12 @@ import {
   ChevronDown
 } from 'lucide-react';
 import PoliceReport from '@/components/PoliceReport';
+import { useTranslations } from 'next-intl';
 
 export default function ReceptionistPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const t = useTranslations('receptionist');
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showPReport, setShowPReport] = useState(false);
@@ -113,35 +115,7 @@ export default function ReceptionistPage() {
   return (
     <div className="min-h-screen bg-[#09090b] text-zinc-100 antialiased selection:bg-amber-500/30 selection:text-amber-200">
       {/* Luxury Dark/Gold Navbar */}
-      <nav className="bg-[#0c0c0e] border-b border-zinc-800/80 sticky top-0 z-50 backdrop-blur-md bg-[#0c0c0e]/90">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <div className="bg-gradient-to-br from-amber-400 to-amber-600 p-2.5 rounded-xl text-zinc-950 shadow-lg shadow-amber-500/10">
-              <Calendar className="w-5 h-5 stroke-[2]" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200">
-                Reception Desk
-              </h1>
-              <p className="text-[10px] text-amber-500/70 font-semibold tracking-widest uppercase mt-0.5">
-                Front Desk Operations
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-3 bg-zinc-900/80 px-4 py-2 rounded-xl border border-zinc-800">
-              <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-amber-400 border border-zinc-700">
-                <User className="w-4 h-4" />
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="text-xs font-semibold text-zinc-200">{(session?.user as any)?.name}</span>
-                <span className="text-[9px] text-amber-500/80 font-medium tracking-wider uppercase">Concierge</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
+    
 
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Dynamic Action Matrix */}
@@ -156,20 +130,20 @@ export default function ReceptionistPage() {
               </span>
             </div>
             <h3 className="text-lg font-bold text-zinc-100 mt-5 mb-1.5 tracking-tight group-hover:text-amber-300 transition-colors">
-              Process Check-ins
+              {t('cards.checkIn.title')}
             </h3>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              Verify incoming reservations, coordinate tailored requests, and activate digital suite keys.
+              {t('cards.checkIn.description')}
             </p>
           </div>
 
           <div className="group bg-[#0c0c0e] border border-zinc-800/80 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:border-amber-500/30 hover:shadow-amber-500/[0.02]">
            
             <h3 className="text-lg font-bold text-zinc-100 mt-5 mb-1.5 tracking-tight group-hover:text-amber-300 transition-colors">
-              Manage Departures
+              {t('cards.departures.title')}
             </h3>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              Finalize statement folios, log incidentals, and transition rooms back to structural priority.
+              {t('cards.departures.description')}
             </p>
 
           </div>
@@ -183,17 +157,17 @@ export default function ReceptionistPage() {
               </span>
             </div>
             <h3 className="text-lg font-bold text-zinc-100 mt-5 mb-1.5 tracking-tight group-hover:text-amber-300 transition-colors">
-              Generate Police Report
+              {t('cards.policeReport.title')}
             </h3>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              Compile a comprehensive police report of all current guests, including their personal details and stay information, for law enforcement verification.
+              {t('cards.policeReport.description')}
             </p>
                <div className="bg-white rounded-xl shadow overflow-hidden">
           <button
             onClick={() => setShowPReport(!showPReport)}
             className="w-full flex items-center justify-between p-5 text-xl font-semibold text-gray-800 hover:bg-gray-50 transition"
           >
-            <span>Generate Police Report</span>
+            <span>{t('cards.policeReport.title')}</span>
             {showPReport ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
             
           </button>
@@ -212,36 +186,36 @@ export default function ReceptionistPage() {
           <div className="px-8 py-6 border-b border-zinc-800/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold tracking-tight text-zinc-100">
-                Today&apos;s Operations
+                {t('operationsTitle')}
               </h2>
               <p className="text-xs text-amber-500/70 font-medium mt-1">
-                Central verification queue for scheduled arrivals and suite itineraries
+                {t('operationsSubtitle')}
               </p>
             </div>
           </div>
 
           {loading ? (
             <div className="p-16 text-center text-amber-400/60 font-medium tracking-wide animate-pulse">
-              Synchronizing with central property management database...
+              {t('loading')}
             </div>
           ) : bookings.length === 0 ? (
             <div className="p-20 text-center">
               <Calendar className="w-12 h-12 text-zinc-700 mx-auto mb-4" />
-              <p className="text-zinc-500 font-medium">No logistical operations recorded for this cycle.</p>
+              <p className="text-zinc-500 font-medium">{t('empty')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-zinc-900/40 border-b border-zinc-800/60">
-                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80">Booking Date</th>
-                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80">Guest Folio</th>
-                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80">Suite</th>
-                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80">Itinerary</th>
-                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80">Status</th>
-                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80">Preferences</th>
-                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80 text-center">Verification</th>
-                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80 text-right">Desk Action</th>
+                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80">{t('table.bookingDate')}</th>
+                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80">{t('table.guestFolio')}</th>
+                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80">{t('table.suite')}</th>
+                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80">{t('table.itinerary')}</th>
+                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80">{t('table.status')}</th>
+                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80">{t('table.preferences')}</th>
+                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80 text-center">{t('table.verification')}</th>
+                    <th className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider text-amber-500/80 text-right">{t('table.deskAction')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/40">

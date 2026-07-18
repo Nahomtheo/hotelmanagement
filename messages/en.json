@@ -1,0 +1,290 @@
+{
+  "nav": {
+    "brand": "EthioStay",
+    "links": {
+      "rooms": "Rooms",
+      "destinations": "Destinations",
+      "offers": "Offers",
+      "culture": "Culture"
+    },
+    "welcome": "Welcome, {name}!",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "register": "Register",
+    "menuLabel": "Toggle menu"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to continue your stay",
+      "email": "Email",
+      "password": "Password",
+      "emailPlaceholder": "Enter your email",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Sign In",
+      "submitLoading": "Signing in...",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don’t have an account?",
+      "registerLink": "Create one",
+      "errors": {
+        "invalidCredentials": "Invalid email or password",
+        "generic": "Unable to sign in right now"
+      }
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join EthioStay and book your next stay",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "emailPlaceholder": "Enter your email",
+      "phonePlaceholder": "Enter your phone number",
+      "passwordPlaceholder": "Create a password",
+      "submit": "Create Account",
+      "submitLoading": "Creating account...",
+      "haveAccount": "Already have an account?",
+      "signInLink": "Sign in",
+      "success": "Account created successfully",
+      "errors": {
+        "passwordMismatch": "Passwords do not match",
+        "registrationFailed": "Registration failed",
+        "generic": "Unable to create account right now"
+      }
+    }
+  },
+  "home": {
+    "exploreTitle": "Explore",
+    "exploreHighlight": "Ethiopia",
+    "places": {
+      "lalibela": { "name": "Lalibela", "desc": "Rock-hewn churches & ancient heritage" },
+      "gondar": { "name": "Gondar", "desc": "Castles of Ethiopian kings" },
+      "simien": { "name": "Simien Mountains", "desc": "Dramatic landscapes & wildlife" }
+    },
+    "roomsTitle": "Luxury",
+    "roomsHighlight": "Rooms",
+    "roomCards": {
+      "deluxe": { "name": "Deluxe Suite" },
+      "executive": { "name": "Executive Room" },
+      "royal": { "name": "Royal Suite" }
+    },
+    "viewDetails": "View Details",
+    "stats": {
+      "boutique": "Boutique Stays",
+      "guests": "Happy Guests",
+      "satisfaction": "Satisfaction Rate"
+    },
+    "amenitiesTitle": "Hotel",
+    "amenitiesHighlight": "Amenities",
+    "amenities": {
+      "freeWifi": "Free WiFi",
+      "breakfast": "Breakfast Included",
+      "airportPickup": "Airport Pickup",
+      "support": "24/7 Support",
+      "spa": "Spa & Wellness",
+      "cityTours": "City Tours",
+      "roomService": "Room Service",
+      "transport": "Luxury Transport"
+    },
+    "testimonialsTitle": "What Guests",
+    "testimonialsHighlight": "Say",
+    "testimonials": {
+      "sarah": { "name": "Sarah", "text": "Absolutely beautiful experience. Ethiopian hospitality is unmatched." },
+      "daniel": { "name": "Daniel", "text": "Luxury rooms and stunning locations. Highly recommended!" },
+      "amina": { "name": "Amina", "text": "Best travel booking platform for Ethiopia." }
+    },
+    "ctaTitle": "Ready to Experience Ethiopia?",
+    "ctaDescription": "Join thousands of travelers discovering authentic stays across historic routes.",
+    "ctaButton": "Create Free Account",
+    "footer": {
+      "brand": "EthioStay",
+      "description": "Luxury hotel booking platform inspired by classic East African hospitality.",
+      "explore": "Explore",
+      "links": {
+        "hotels": "Hotels",
+        "destinations": "Destinations",
+        "offers": "Offers"
+      },
+      "support": "Support",
+      "helpCenter": "Help Center",
+      "contact": "Contact",
+      "faq": "FAQ",
+      "legal": "Legal",
+      "privacy": "Privacy Policy",
+      "terms": "Terms",
+      "rights": "All rights reserved."
+    }
+  },
+  "roomsPage": {
+    "title": "Available Rooms",
+    "checkInDate": "Check-in Date",
+    "checkOutDate": "Check-out Date",
+    "loading": "Curating available sanctuaries...",
+    "noImage": "NO IMAGE AVAILABLE",
+    "roomLabel": "Room {number}",
+    "status": {
+      "available": "Available",
+      "unavailable": "Unavailable"
+    },
+    "suite": "Suite",
+    "accommodates": "Accommodates up to {count} Guests",
+    "defaultDescription": "No description available for this room.",
+    "pricePerNight": "Price per night",
+    "bookButton": "Book Sanctuary",
+    "reserveTitle": "Reserve Room {number}",
+    "reserveSubtitle": "Provide details to secure your accommodation parameters.",
+    "selectedSuite": "Selected Suite",
+    "room": "Room",
+    "rate": "Rate",
+    "night": "night",
+    "guestName": "Guest Name",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "nationality": "Nationality",
+    "nationalityPlaceholder": "-- Select Nationality --",
+    "checkIn": "Check-In",
+    "checkOut": "Check-Out",
+    "durationMetrics": "Duration metrics: {nights} Nights",
+    "totalCost": "Total: ${total}",
+    "numberOfGuests": "Number of Guests",
+    "reasonOfStay": "Reason of Stay",
+    "passportNumber": "Passport Number",
+    "idNumber": "ID Number",
+    "specialRequests": "Special Requests",
+    "specialRequestsPlaceholder": "Airport arrangements, dynamic culinary requests...",
+    "cancel": "Cancel",
+    "confirmReservation": "Confirm Reservation",
+    "alerts": {
+      "bookingSuccess": "Booking created successfully!",
+      "bookingFailed": "Booking failed",
+      "createBookingFailed": "Failed to create booking"
+    }
+  },
+  "dashboard": {
+    "loading": "LOADING ETHIOSTAY...",
+    "quickActions": {
+      "browseRooms": {
+        "title": "Browse Rooms",
+        "description": "Explore hand-picked luxury lodges, heritage houses, and boutique spaces."
+      },
+      "myBookings": {
+        "title": "My Bookings",
+        "description": "Review timelines, upgrade packages, or view itinerary confirmations."
+      },
+      "myProfile": {
+        "title": "My Profile",
+        "description": "Update dynamic parameters, customize stay preferences, and settings."
+      }
+    },
+    "recentBookings": {
+      "title": "Recent Bookings",
+      "loading": "Loading reservation history...",
+      "empty": "No active reservations discovered.",
+      "browseRooms": "Browse rooms"
+    },
+    "table": {
+      "room": "Room",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "status": "Status",
+      "totalBill": "Total Bill",
+      "roomLabel": "Room {number}"
+    }
+  },
+  "receptionist": {
+    "title": "Reception Desk",
+    "subtitle": "Front Desk Operations",
+    "cards": {
+      "checkIn": {
+        "title": "Process Check-ins",
+        "description": "Verify incoming reservations, coordinate tailored requests, and activate digital suite keys."
+      },
+      "departures": {
+        "title": "Manage Departures",
+        "description": "Finalize statement folios, log incidentals, and transition rooms back to structural priority."
+      },
+      "policeReport": {
+        "title": "Generate Police Report",
+        "description": "Compile a comprehensive police report of all current guests, including their personal details and stay information, for law enforcement verification."
+      }
+    },
+    "operationsTitle": "Today's Operations",
+    "operationsSubtitle": "Central verification queue for scheduled arrivals and suite itineraries",
+    "loading": "Synchronizing with central property management database...",
+    "empty": "No logistical operations recorded for this cycle.",
+    "table": {
+      "bookingDate": "Booking Date",
+      "guestFolio": "Guest Folio",
+      "suite": "Suite",
+      "itinerary": "Itinerary",
+      "status": "Status",
+      "preferences": "Preferences",
+      "verification": "Verification",
+      "deskAction": "Desk Action"
+    }
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "welcome": "Welcome, Admin!",
+    "stats": {
+      "totalBookings": "Total Bookings",
+      "totalUsers": "Total Users",
+      "totalRevenue": "Total Revenue",
+      "occupancyRate": "Occupancy Rate"
+    },
+    "links": {
+      "manageRooms": {
+        "title": "Manage Rooms",
+        "description": "Create, edit, and manage hotel rooms"
+      },
+      "manageBookings": {
+        "title": "Manage Bookings",
+        "description": "View and manage all bookings"
+      },
+      "manageUsers": {
+        "title": "Manage Users",
+        "description": "View and manage user accounts"
+      },
+      "reports": {
+        "title": "Reports",
+        "description": "View revenue and occupancy reports"
+      }
+    }
+  },
+  "adminRooms": {
+    "title": "Manage Rooms",
+    "createRoom": "Create a New Room",
+    "updateRooms": "Update Existing Rooms",
+    "selectRoom": "Select a room from the list below to begin editing:",
+    "editRoom": "Edit Room",
+    "noRooms": "No rooms available.",
+    "editingRoom": "Editing Room Details: {number}",
+    "backToList": "Back to Room List"
+  },
+  "policeReport": {
+    "print": "Print / Save as PDF",
+    "title": "Police Report",
+    "managerDetails": "Manager Details",
+    "ownerDetails": "Owner Details",
+    "name": "Name",
+    "phone": "Phone",
+    "guestName": "Guest Name",
+    "nationality": "Nationality",
+    "passport": "Passport No.",
+    "idNumber": "ID Number",
+    "phoneNo": "Phone No.",
+    "checkIn": "Check-In",
+    "checkOut": "Check-Out",
+    "reason": "Reason of Stay",
+    "action": "Action",
+    "edit": "Edit",
+    "save": "Save",
+    "checkedByHotel": "Checked By (Hotel Staff)",
+    "checkedByPolice": "Checked By (Police Department)",
+    "position": "Position",
+    "signature": "Signature",
+    "date": "Date"
+  }
+}

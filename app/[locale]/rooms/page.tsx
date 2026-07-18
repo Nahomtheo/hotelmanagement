@@ -7,10 +7,12 @@ import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import RoomImageCard from '@/components/ui/imagecard';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 export default function RoomsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const t = useTranslations('roomsPage');
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [checkInDate, setCheckInDate] = useState('');
@@ -84,16 +86,16 @@ export default function RoomsPage() {
 
       const data = await res.json();
       if (data.success) {
-        alert('Booking created successfully!');
+        alert(t('alerts.bookingSuccess'));
         setShowBookingForm(false);
         setSelectedRoom(null);
         fetchRooms();
       } else {
-        alert(data.message || 'Booking failed');
+        alert(data.message || t('alerts.bookingFailed'));
       }
     } catch (error) {
       console.error('Booking error:', error);
-      alert('Failed to create booking');
+      alert(t('alerts.createBookingFailed'));
     }
   };
 
@@ -118,11 +120,11 @@ export default function RoomsPage() {
           
           {/* Header & Date Pickers */}
           <div className="mb-12  flex flex-col md:flex-row md:items-center md:justify-between gap-6 mt-6">
-            <h2 className="text-3xl font-bold tracking-wide text-zinc-100 mb-6">Available Rooms</h2>
+            <h2 className="text-3xl font-bold tracking-wide text-zinc-100 mb-6">{t('title')}</h2>
             
             <div className="grid md:grid-cols-2 gap-6 backdrop-blur-md bg-zinc-950/40 border border-white/[0.06] rounded-2xl p-6 shadow-xl">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-2.5">Check-in Date</label>
+                <label className="block text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-2.5">{t('checkInDate')}</label>
                 <input
                   type="date"
                   value={checkInDate}
@@ -131,7 +133,7 @@ export default function RoomsPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-2.5">Check-out Date</label>
+                <label className="block text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-2.5">{t('checkOutDate')}</label>
                 <input
                   type="date"
                   value={checkOutDate}
@@ -145,7 +147,7 @@ export default function RoomsPage() {
           {/* Rooms Display */}
           {loading ? (
             <div className="text-center py-24 text-zinc-400 font-light tracking-wide animate-pulse">
-              Curating available sanctuaries...
+              {t('loading')}
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -156,7 +158,7 @@ export default function RoomsPage() {
                       <RoomImageCard images={room.images} />
                     ) : (
                       <div className="flex h-full items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900">
-                        <span className="text-zinc-500 text-xs tracking-widest">NO IMAGE AVAILABLE</span>
+                        <span className="text-zinc-500 text-xs tracking-widest">{t('noImage')}</span>
                       </div>
                     )}
                   </div>
@@ -164,21 +166,21 @@ export default function RoomsPage() {
                   <div className="p-6 pt-3 flex-1 flex flex-col justify-between">
                     <div>
                       <div className="flex items-baseline justify-between mb-2">
-                        <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-amber-400 transition-colors">Room {room.roomNumber}</h3>
+                        <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-amber-400 transition-colors">{t('roomLabel', { number: room.roomNumber })}</h3>
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border ${
                           room.status === 'available' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
                         }`}>
                           {room.status}
                         </span>
                       </div>
-                      <p className="text-xs text-zinc-400 font-light capitalize mb-1">{room.type} Suite</p>
-                      <p className="text-xs text-zinc-500 font-light mb-2">Accommodates up to {room.maxGuests} Guests</p>
-                      <p className="text-sm text-zinc-400 font-light mb-2">{room.description || "No description available for this room."}</p>
+                      <p className="text-xs text-zinc-400 font-light capitalize mb-1">{room.type} {t('suite')}</p>
+                      <p className="text-xs text-zinc-500 font-light mb-2">{t('accommodates', { count: room.maxGuests })}</p>
+                      <p className="text-sm text-zinc-400 font-light mb-2">{room.description || t('defaultDescription')}</p>
                     </div>
 
                     <div>
                       <div className="flex justify-between items-baseline mb-4">
-                        <span className="text-zinc-400 text-xs font-light">Price per night</span>
+                        <span className="text-zinc-400 text-xs font-light">{t('pricePerNight')}</span>
                         <span className="text-2xl font-bold text-amber-400">${room.pricePerNight}</span>
                       </div>
                       
@@ -189,7 +191,7 @@ export default function RoomsPage() {
                         disabled={room.status !== 'available'}
                         className="w-full bg-zinc-900/80 border border-white/[0.08] hover:bg-amber-500 hover:text-zinc-950 hover:border-transparent text-zinc-100 font-medium py-5 rounded-xl disabled:opacity-30 disabled:hover:bg-zinc-900/80 disabled:hover:text-zinc-100 transition-all duration-300"
                       >
-                        Book Sanctuary
+                        {t('bookButton')}
                       </Button>
                     </div>
                   </div>
@@ -218,8 +220,8 @@ export default function RoomsPage() {
               {/* Modal Header */}
               <div className="border-b border-white/[0.06] bg-zinc-950/40 px-8 py-5 flex justify-between items-center">
                 <div>
-                  <h2 className="text-xl font-bold tracking-wide text-zinc-100">Reserve Room {selectedRoom?.roomNumber}</h2>
-                  <p className="text-xs text-zinc-400 font-light mt-0.5">Provide details to secure your accommodation parameters.</p>
+                  <h2 className="text-xl font-bold tracking-wide text-zinc-100">{t('reserveTitle', { number: selectedRoom?.roomNumber })}</h2>
+                  <p className="text-xs text-zinc-400 font-light mt-0.5">{t('reserveSubtitle')}</p>
                 </div>
                 <button 
                   onClick={() => { setShowBookingForm(false); setSelectedRoom(null); }}
@@ -235,18 +237,18 @@ export default function RoomsPage() {
                 {/* Embedded dynamic summary */}
                 <div className="rounded-xl bg-zinc-950/50 border border-white/[0.04] p-4 flex justify-between items-center">
                   <div>
-                    <span className="text-[10px] tracking-widest text-zinc-500 uppercase block font-semibold">Selected Suite</span>
+                    <span className="text-[10px] tracking-widest text-zinc-500 uppercase block font-semibold">{t('selectedSuite')}</span>
                     <span className="text-sm font-medium capitalize text-zinc-200">{selectedRoom.type} Room</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] tracking-widest text-zinc-500 uppercase block font-semibold">Rate</span>
-                    <span className="text-lg font-bold text-amber-400">${selectedRoom.pricePerNight} <span className="text-xs text-zinc-400 font-light">/ night</span></span>
+                    <span className="text-[10px] tracking-widest text-zinc-500 uppercase block font-semibold">{t('rate')}</span>
+                    <span className="text-lg font-bold text-amber-400">${selectedRoom.pricePerNight} <span className="text-xs text-zinc-400 font-light">/ {t('night')}</span></span>
                   </div>
                 </div>
 
                 <form onSubmit={handleSubmitBooking} className="space-y-5">
                   <div>
-                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">Guest Name</label>
+                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">{t('guestName')}</label>
                     <input
                       type="text"
                       name="guestName"
@@ -257,7 +259,7 @@ export default function RoomsPage() {
 
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                      <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">Email Address</label>
+                      <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">{t('email')}</label>
                       <input
                         type="email"
                         name="guestEmail"
@@ -266,7 +268,7 @@ export default function RoomsPage() {
                       />
                     </div>
                     <div>
-                      <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">Phone Number</label>
+                      <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">{t('phone')}</label>
                       <input
                         type="tel"
                         name="guestPhone"
@@ -276,7 +278,7 @@ export default function RoomsPage() {
                     </div>
                   </div>
                   <label htmlFor="nationality" className="text-xs font-bold uppercase mb-1">
-        Nationality
+        {t('nationality')}
       </label>
       
       <select
@@ -284,7 +286,7 @@ export default function RoomsPage() {
         name="nationality"
         className="border p-2 rounded max-h-40 overflow-y-auto bg-white text-black"
       >
-        <option value="">-- Select Nationality --</option>
+        <option value="">{t('nationalityPlaceholder')}</option>
         {NATIONALITIES.map((country) => (
           <option key={country} value={country}>
             {country}
@@ -294,7 +296,7 @@ export default function RoomsPage() {
 
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                      <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">Check-In</label>
+                      <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">{t('checkIn')}</label>
                       <input
                         type="date"
                         name="checkIn"
@@ -306,7 +308,7 @@ export default function RoomsPage() {
                       />
                     </div>
                     <div>
-                      <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">Check-Out</label>
+                      <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">{t('checkOut')}</label>
                       <input
                         type="date"
                         name="checkOut"
@@ -320,13 +322,13 @@ export default function RoomsPage() {
 
                   {numberOfNights > 0 && (
                     <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.02] flex justify-between items-center">
-                      <span className="text-xs text-zinc-400 font-light">Duration metrics: <strong className="text-zinc-200 font-normal">{numberOfNights} Nights</strong></span>
-                      <span className="text-md font-semibold text-emerald-400">Total: ${numberOfNights * selectedRoom.pricePerNight}</span>
+                      <span className="text-xs text-zinc-400 font-light">{t('durationMetrics', { nights: numberOfNights })}</span>
+                      <span className="text-md font-semibold text-emerald-400">{t('totalCost', { total: numberOfNights * selectedRoom.pricePerNight })}</span>
                     </div>
                   )}
 
                   <div>
-                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">Number of Guests</label>
+                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">{t('numberOfGuests')}</label>
                     <input
                       type="number"
                       name="numberOfGuests"
@@ -337,7 +339,7 @@ export default function RoomsPage() {
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">reason of stay</label>
+                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">{t('reasonOfStay')}</label>
                     <input
                       type='text'
                       name='reasonOfStay'
@@ -346,7 +348,7 @@ export default function RoomsPage() {
                       />
                   </div>
                    <div>
-                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">passport number</label>
+                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">{t('passportNumber')}</label>
                     <input
                       type='text'
                       name='passportno'
@@ -355,7 +357,7 @@ export default function RoomsPage() {
                       />
                   </div>
                    <div>
-                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">ID number</label>
+                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">{t('idNumber')}</label>
                     <input
                       type='text'
                       name='idnumber'
@@ -365,11 +367,11 @@ export default function RoomsPage() {
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">Special Requests</label>
+                    <label className="mb-2 block text-xs font-semibold tracking-wider text-zinc-400 uppercase">{t('specialRequests')}</label>
                     <textarea
                       name="specialRequests"
                       rows={3}
-                      placeholder="Airport arrangements, dynamic culinary requests..."
+                      placeholder={t('specialRequestsPlaceholder')}
                       className="w-full bg-zinc-950/40 border border-white/[0.08] text-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/40 transition resize-none placeholder:text-zinc-600"
                     />
                   </div>
@@ -384,13 +386,13 @@ export default function RoomsPage() {
                       }}
                       className="flex-1 rounded-xl border border-white/[0.08] py-3 text-sm text-zinc-300 font-medium hover:bg-white/[0.04] transition"
                     >
-                      Cancel
+                      {t('cancel')}
                     </button>
                     <button
                       type="submit"
                       className="flex-1 rounded-xl bg-amber-500 text-zinc-950 font-semibold py-3 text-sm shadow-xl shadow-amber-500/5 hover:bg-amber-400 transition"
                     >
-                      Confirm Reservation
+                      {t('confirmReservation')}
                     </button>
                   </div>
                 </form>

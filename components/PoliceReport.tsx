@@ -1,9 +1,11 @@
 "use client";
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect,useMemo } from 'react';
 import { useReactToPrint } from 'react-to-print';
+import { useTranslations, useLocale } from 'next-intl'; // Added useLocale
+import { useTranslatedData } from '@/lib/services/translationService'; // Ensure path points to your hook implementation
 
 interface GuestRecord {
-  _id: string;  // Assuming you might want to include an ID for database updates
+  _id: string;
   guestName: string;
   nationality: string;
   passport_no: string;
@@ -32,28 +34,44 @@ const PoliceReport: React.FC<PoliceReportProps> = ({
   guests = []
 }) => {
   const reportRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations('policeReport');
+  const locale = useLocale();
   const minimumRows = 6;
 
-  // Prepare fully padded array FIRST so state initializes cleanly with all rows
-  const paddedGuests = [...guests];
-  while (paddedGuests.length < minimumRows) {
-    paddedGuests.push({
-      _id: "",  // Assuming you might want to include an ID for database updates
-      guestName: "",
-      nationality: "",
-      passport_no: "",
-      id_no: "",
-      guestPhone: "",
-      checkInDate: "",
-      checkOutDate: "",
-      reasonOfStay: ""
-    });
+  // 2. Wrap padding logic in useMemo so the array reference remains stable
+  const paddedGuests = useMemo(( ) => {
+    const tempGuests = [...guests];
+    while (tempGuests.length < minimumRows) {
+      tempGuests.push({
+        _id: "",
+        guestName: "",
+        nationality: "",
+        passport_no: "",
+        id_no: "",
+        guestPhone: "",
+        checkInDate: "",
+        checkOutDate: "",
+        reasonOfStay: ""
+      });
+    }
+    return tempGuests;
+  }, [guests]); // Only recompute if the incoming guests prop actually changes
+
+
+
+// Pass the memoized array to the translator hook
+const { translatedGuests, loading } = useTranslatedData(paddedGuests, locale);
+
+const [form, setForm] = useState<GuestRecord[]>(paddedGuests);
+const [editingIndex, setEditingIndex] = useState<number>(-1);
+const [isSaving, setIsSaving] = useState<boolean>(false);
+
+// Update local form state when the translated data finishes loading
+useEffect(() => {
+  if (translatedGuests && translatedGuests.length > 0) {
+    setForm(translatedGuests);
   }
-
-  const [form, setForm] = useState<GuestRecord[]>(paddedGuests);
-  const [editingIndex, setEditingIndex] = useState<number>(-1);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-
+}, [translatedGuests]);
   const handlePrint = useReactToPrint({
     contentRef: reportRef,
     documentTitle: "Police_Report",
@@ -65,14 +83,8 @@ const PoliceReport: React.FC<PoliceReportProps> = ({
     setForm(newForm);
   };
 
-  // Synchronize dynamic updates back using PUT via passport number
   const handleSaveRow = async (index: number) => {
     const guestToSave = form[index];
-
-    // Ensure DB connection is established before making the request
-
-  
-
     setIsSaving(true);
     try {
       const response = await fetch(`/api/bookings/${guestToSave._id}`, {
@@ -84,7 +96,7 @@ const PoliceReport: React.FC<PoliceReportProps> = ({
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update guest details in the database');
+        throw new Error('Failed to update guest details');
       }
 
       setEditingIndex(-1);
@@ -98,13 +110,20 @@ const PoliceReport: React.FC<PoliceReportProps> = ({
 
   return (
     <div className="bg-gray-100 p-6 min-h-screen font-sans screen:pb-12">
+      {/* Visual Indicator showing translation process to users */}
+      {loading && (
+        <div className="max-w-6xl mx-auto mb-2 text-center text-xs text-amber-600 bg-amber-50 p-2 border border-amber-200 rounded animate-pulse font-semibold print:hidden">
+          Translating report rows to Amharic script via API...
+        </div>
+      )}
+
       {/* Print Action Button */}
       <div className="max-w-6xl mx-auto mb-4 flex justify-end print:hidden">
         <button 
           onClick={() => handlePrint()}
           className="bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 px-5 rounded shadow text-sm transition-colors"
         >
-          Print / Save as PDF
+          {t('print')}
         </button>
       </div>
 
@@ -128,7 +147,7 @@ const PoliceReport: React.FC<PoliceReportProps> = ({
         {/* Top Header */}
         <div className="text-center border-b-2 border-slate-800 pb-3 mb-6">
           <h1 className="text-2xl font-black tracking-wider uppercase text-slate-900 m-0">
-            Police Report
+            {t('title')}
           </h1>
           <div className="text-lg font-bold text-slate-600 mt-1 uppercase">
             {hotelName}
@@ -139,7 +158,7 @@ const PoliceReport: React.FC<PoliceReportProps> = ({
         <div className="grid grid-cols-2 gap-4 bg-slate-50 border border-slate-200 rounded p-3 mb-6 text-xs">
           <div>
             <span className="block font-semibold uppercase tracking-wider text-[10px] text-slate-500 mb-1">
-              Manager Details
+              {t('managerDetails')}
             </span>
             <div className="text-slate-800">
               <span className="font-medium">Name:</span> {managerName} 
@@ -149,7 +168,7 @@ const PoliceReport: React.FC<PoliceReportProps> = ({
           </div>
           <div className="text-right">
             <span className="block font-semibold uppercase tracking-wider text-[10px] text-slate-500 mb-1">
-              Owner Details
+              {t('ownerDetails')}
             </span>
             <div className="text-slate-800">
               <span className="font-medium">Name:</span> {ownerName} 
@@ -164,21 +183,20 @@ const PoliceReport: React.FC<PoliceReportProps> = ({
           <table className="w-full border-collapse border border-slate-300 text-left text-xs">
             <thead>
               <tr className="bg-slate-800 text-white uppercase tracking-wider text-[10px]">
-                <th className="border border-slate-800 p-2.5 w-[16%]">Guest Name</th>
-                <th className="border border-slate-800 p-2.5 w-[10%]">Nationality</th>
-                <th className="border border-slate-800 p-2.5 w-[11%]">Passport No.</th>
-                <th className="border border-slate-800 p-2.5 w-[11%]">ID Number</th>
-                <th className="border border-slate-800 p-2.5 w-[11%]">Phone No.</th>
-                <th className="border border-slate-800 p-2.5 w-[10%]">Check-In</th>
-                <th className="border border-slate-800 p-2.5 w-[10%]">Check-Out</th>
-                <th className="border border-slate-800 p-2.5 w-[16%]">Reason of Stay</th>
-                <th className="border border-slate-800 p-2.5 w-[5%] print:hidden">Action</th>
+                <th className="border border-slate-800 p-2.5 w-[16%]">{t('guestName')}</th>
+                <th className="border border-slate-800 p-2.5 w-[10%]">{t('nationality')}</th>
+                <th className="border border-slate-800 p-2.5 w-[11%]">{t('passport')}</th>
+                <th className="border border-slate-800 p-2.5 w-[11%]">{t('idNumber')}</th>
+                <th className="border border-slate-800 p-2.5 w-[11%]">{t('phoneNo')}</th>
+                <th className="border border-slate-800 p-2.5 w-[10%]">{t('checkIn')}</th>
+                <th className="border border-slate-800 p-2.5 w-[10%]">{t('checkOut')}</th>
+                <th className="border border-slate-800 p-2.5 w-[16%]">{t('reason')}</th>
+                <th className="border border-slate-800 p-2.5 w-[5%] print:hidden">{t('action')}</th>
               </tr>
             </thead>
             <tbody>
               {form.map((guest, index) => {
                 const isEditing = editingIndex === index;
-                // Safely format dates to avoid crash when splitting undefined variables
                 const checkInFormatted = guest.checkInDate ? guest.checkInDate.split('T')[0] : '';
                 const checkOutFormatted = guest.checkOutDate ? guest.checkOutDate.split('T')[0] : '';
 
@@ -208,6 +226,7 @@ const PoliceReport: React.FC<PoliceReportProps> = ({
                     <td className="border border-slate-300 p-1 text-slate-700">
                       {isEditing ? <input type="date" className="w-full p-1 border rounded text-xs bg-white" value={checkOutFormatted} onChange={(e) => handleInputChange(index, 'checkOutDate', e.target.value)} /> : checkOutFormatted}
                     </td>
+                    {/* The Purpose/Reason of stay will dynamically adjust using the semantic translation fetched from the hook context inside the form layout */}
                     <td className="border border-slate-300 p-1 text-slate-700">
                       {isEditing ? <input type="text" className="w-full p-1 border rounded text-xs bg-white" value={guest.reasonOfStay || ""} onChange={(e) => handleInputChange(index, 'reasonOfStay', e.target.value)} /> : (guest.reasonOfStay || "")}
                     </td>
@@ -218,14 +237,14 @@ const PoliceReport: React.FC<PoliceReportProps> = ({
                           disabled={isSaving}
                           className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-1 px-2.5 rounded text-[10px] transition-colors"
                         >
-                          {isSaving ? "..." : "Save"}
+                          {isSaving ? "..." : t('save')}
                         </button>
                       ) : (
                         <button 
                           onClick={() => setEditingIndex(index)} 
                           className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-1 px-2.5 rounded text-[10px] transition-colors"
                         >
-                          Edit
+                          {t('edit')}
                         </button>
                       )}
                     </td>
@@ -240,7 +259,7 @@ const PoliceReport: React.FC<PoliceReportProps> = ({
         <div className="flex justify-between mt-12 text-xs print:break-inside-avoid">
           <div className="w-[42%] flex flex-col gap-3">
             <div className="font-bold uppercase tracking-wide text-slate-800 border-b border-slate-800 pb-1 mb-1">
-              Checked By (Hotel Staff)
+              {t('checkedByHotel')}
             </div>
             <div className="flex items-end h-5"><span className="w-20 font-semibold text-slate-500">Name:</span><span className="flex-1 border-b border-dotted border-slate-400"></span></div>
             <div className="flex items-end h-5"><span className="w-20 font-semibold text-slate-500">Position:</span><span className="flex-1 border-b border-dotted border-slate-400"></span></div>
@@ -250,7 +269,7 @@ const PoliceReport: React.FC<PoliceReportProps> = ({
 
           <div className="w-[42%] flex flex-col gap-3">
             <div className="font-bold uppercase tracking-wide text-slate-800 border-b border-slate-800 pb-1 mb-1">
-              Checked By (Police Department)
+              {t('checkedByPolice')}
             </div>
             <div className="flex items-end h-5"><span className="w-20 font-semibold text-slate-500">Name:</span><span className="flex-1 border-b border-dotted border-slate-400"></span></div>
             <div className="flex items-end h-5"><span className="w-20 font-semibold text-slate-500">Position:</span><span className="flex-1 border-b border-dotted border-slate-400"></span></div>

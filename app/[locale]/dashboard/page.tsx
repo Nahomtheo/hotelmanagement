@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const t = useTranslations('dashboard');
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -41,7 +43,7 @@ export default function DashboardPage() {
   if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0d0d11] text-amber-500 font-medium tracking-widest">
-        LOADING ETHIOSTAY...
+        {t('loading')}
       </div>
     );
   }
@@ -97,8 +99,8 @@ export default function DashboardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-zinc-100 mb-1.5 transition-colors group-hover:text-amber-400">Browse Rooms</h3>
-              <p className="text-zinc-400/90 text-xs leading-relaxed font-light">Explore hand-picked luxury lodges, heritage houses, and boutique spaces.</p>
+              <h3 className="text-lg font-semibold text-zinc-100 mb-1.5 transition-colors group-hover:text-amber-400">{t('quickActions.browseRooms.title')}</h3>
+              <p className="text-zinc-400/90 text-xs leading-relaxed font-light">{t('quickActions.browseRooms.description')}</p>
             </motion.div>
           </Link>
 
@@ -115,8 +117,8 @@ export default function DashboardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-zinc-100 mb-1.5 transition-colors group-hover:text-amber-400">My Bookings</h3>
-              <p className="text-zinc-400/90 text-xs leading-relaxed font-light">Review timelines, upgrade packages, or view itinerary confirmations.</p>
+              <h3 className="text-lg font-semibold text-zinc-100 mb-1.5 transition-colors group-hover:text-amber-400">{t('quickActions.myBookings.title')}</h3>
+              <p className="text-zinc-400/90 text-xs leading-relaxed font-light">{t('quickActions.myBookings.description')}</p>
             </motion.div>
           </Link>
 
@@ -133,8 +135,8 @@ export default function DashboardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-zinc-100 mb-1.5 transition-colors group-hover:text-amber-400">My Profile</h3>
-              <p className="text-zinc-400/90 text-xs leading-relaxed font-light">Update dynamic parameters, customize stay preferences, and settings.</p>
+              <h3 className="text-lg font-semibold text-zinc-100 mb-1.5 transition-colors group-hover:text-amber-400">{t('quickActions.myProfile.title')}</h3>
+              <p className="text-zinc-400/90 text-xs leading-relaxed font-light">{t('quickActions.myProfile.description')}</p>
             </motion.div>
           </Link>
         </motion.div>
@@ -148,18 +150,18 @@ export default function DashboardPage() {
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-zinc-100 tracking-wide flex items-center gap-2.5">
-              <span>Recent Bookings</span>
+              <span>{t('recentBookings.title')}</span>
               <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
             </h2>
           </div>
           
           {loading ? (
-            <p className="text-zinc-400 font-light text-sm animate-pulse tracking-wide">Loading reservation history...</p>
+            <p className="text-zinc-400 font-light text-sm animate-pulse tracking-wide">{t('recentBookings.loading')}</p>
           ) : bookings.length === 0 ? (
             <p className="text-zinc-400 font-light text-sm tracking-wide">
-              No active reservations discovered.{' '}
+              {t('recentBookings.empty')}{' '}
               <Link href="/rooms" className="text-amber-400 hover:text-amber-350 underline underline-offset-4 transition-colors font-medium">
-                Browse rooms
+                {t('recentBookings.browseRooms')}
               </Link>
             </p>
           ) : (
@@ -167,11 +169,11 @@ export default function DashboardPage() {
               <table className="w-full token-table">
                 <thead>
                   <tr className="border-b border-white/[0.06] text-zinc-400 text-[11px] font-medium tracking-widest uppercase">
-                    <th className="text-left pb-4 px-3 font-semibold">Room</th>
-                    <th className="text-left pb-4 px-3 font-semibold">Check-in</th>
-                    <th className="text-left pb-4 px-3 font-semibold">Check-out</th>
-                    <th className="text-left pb-4 px-3 font-semibold">Status</th>
-                    <th className="text-right pb-4 px-3 font-semibold">Total Bill</th>
+                    <th className="text-left pb-4 px-3 font-semibold">{t('table.room')}</th>
+                    <th className="text-left pb-4 px-3 font-semibold">{t('table.checkIn')}</th>
+                    <th className="text-left pb-4 px-3 font-semibold">{t('table.checkOut')}</th>
+                    <th className="text-left pb-4 px-3 font-semibold">{t('table.status')}</th>
+                    <th className="text-right pb-4 px-3 font-semibold">{t('table.totalBill')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.04]">
@@ -186,7 +188,7 @@ export default function DashboardPage() {
                         className="hover:bg-white/[0.02] transition-colors group text-sm"
                       >
                         <td className="py-4 px-3 text-zinc-200 font-medium group-hover:text-amber-400 transition-colors">
-                          Room {booking.roomId?.roomNumber || 'N/A'}
+                          {t('table.roomLabel', { number: booking.roomId?.roomNumber || 'N/A' })}
                         </td>
                         <td className="py-4 px-3 text-zinc-400 font-light group-hover:text-zinc-300 transition-colors">
                           {new Date(booking.checkInDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}

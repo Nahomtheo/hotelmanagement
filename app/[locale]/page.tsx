@@ -5,8 +5,10 @@ import { motion, useMotionValue, useTransform } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import ThreeDBackground from "@/components/ui/bg";
+import { useTranslations } from "next-intl";
 
 export default function Page() {
+  const t = useTranslations('home');
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
@@ -44,25 +46,25 @@ export default function Page() {
           viewport={{ once: true }}
           className="text-center text-4xl md:text-5xl font-bold mb-16"
         >
-          Explore <span className="text-amber-500">Ethiopia</span>
+          {t('exploreTitle')} <span className="text-amber-500">{t('exploreHighlight')}</span>
         </motion.h2>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {[
             {
-              name: "Lalibela",
+              name: t('places.lalibela.name'),
               img: "lalibela.jpg",
-              desc: "Rock-hewn churches & ancient heritage",
+              desc: t('places.lalibela.desc'),
             },
             {
-              name: "Gondar",
+              name: t('places.gondar.name'),
               img: "gondar.jpg",
-              desc: "Castles of Ethiopian kings",
+              desc: t('places.gondar.desc'),
             },
             {
-              name: "Simien Mountains",
+              name: t('places.simien.name'),
               img: "Simienm.jpg",
-              desc: "Dramatic landscapes & wildlife",
+              desc: t('places.simien.desc'),
             },
           ].map((place, i) => (
             <motion.div
@@ -98,14 +100,14 @@ export default function Page() {
           viewport={{ once: true }}
           className="text-center text-4xl md:text-5xl font-bold mb-16"
         >
-          Luxury <span className="text-amber-500">Rooms</span>
+          {t('roomsTitle')} <span className="text-amber-500">{t('roomsHighlight')}</span>
         </motion.h2>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {[
-            { name: "Deluxe Suite", price: "$120 / night", img: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=600" },
-            { name: "Executive Room", price: "$180 / night", img: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=600" },
-            { name: "Royal Suite", price: "$250 / night", img: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&q=80&w=600" },
+            { name: t('roomCards.deluxe.name'), price: "$120 / night", img: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=600" },
+            { name: t('roomCards.executive.name'), price: "$180 / night", img: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=600" },
+            { name: t('roomCards.royal.name'), price: "$250 / night", img: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&q=80&w=600" },
           ].map((room, i) => (
             <motion.div
               key={room.name}
@@ -122,7 +124,7 @@ export default function Page() {
                 <h3 className="text-xl font-bold text-white">{room.name}</h3>
                 <p className="text-amber-500 mt-2 font-semibold text-lg">{room.price}</p>
                 <button className="mt-5 w-full py-3 rounded-xl bg-amber-600 text-white font-semibold hover:bg-amber-500 transition shadow-md shadow-amber-950/20">
-                  View Details
+                  {t('viewDetails')}
                 </button>
               </div>
             </motion.div>
@@ -134,9 +136,9 @@ export default function Page() {
       <section className="relative z-10 px-6 py-24 max-w-7xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto text-center">
           {[
-            { value: "120+", label: "Boutique Stays" },
-            { value: "15K+", label: "Happy Guests" },
-            { value: "98%", label: "Satisfaction Rate" },
+            { value: "120+", label: t('stats.boutique') },
+            { value: "15K+", label: t('stats.guests') },
+            { value: "98%", label: t('stats.satisfaction') },
           ].map((stat, i) => (
             <motion.div
               key={stat.label}
@@ -161,13 +163,13 @@ export default function Page() {
           viewport={{ once: true }}
           className="text-center text-4xl md:text-5xl font-bold mb-14"
         >
-          Hotel <span className="text-amber-500">Amenities</span>
+          {t('amenitiesTitle')} <span className="text-amber-500">{t('amenitiesHighlight')}</span>
         </motion.h2>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto text-center">
           {[
-            "Free WiFi", "Breakfast Included", "Airport Pickup", "24/7 Support",
-            "Spa & Wellness", "City Tours", "Room Service", "Luxury Transport"
+            t('amenities.freeWifi'), t('amenities.breakfast'), t('amenities.airportPickup'), t('amenities.support'),
+            t('amenities.spa'), t('amenities.cityTours'), t('amenities.roomService'), t('amenities.transport')
           ].map((item, i) => (
             <motion.div
               key={item}
@@ -192,14 +194,14 @@ export default function Page() {
           viewport={{ once: true }}
           className="text-center text-4xl md:text-5xl font-bold mb-14"
         >
-          What Guests <span className="text-amber-500">Say</span>
+          {t('testimonialsTitle')} <span className="text-amber-500">{t('testimonialsHighlight')}</span>
         </motion.h2>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {[
-            { name: "Sarah", text: "Absolutely beautiful experience. Ethiopian hospitality is unmatched." },
-            { name: "Daniel", text: "Luxury rooms and stunning locations. Highly recommended!" },
-            { name: "Amina", text: "Best travel booking platform for Ethiopia." },
+            { name: t('testimonials.sarah.name'), text: t('testimonials.sarah.text') },
+            { name: t('testimonials.daniel.name'), text: t('testimonials.daniel.text') },
+            { name: t('testimonials.amina.name'), text: t('testimonials.amina.text') },
           ].map((t, i) => (
             <motion.div
               key={t.name}
@@ -224,17 +226,17 @@ export default function Page() {
           viewport={{ once: true }}
           className="text-4xl md:text-5xl font-bold tracking-tight"
         >
-          Ready to Experience Ethiopia?
+          {t('ctaTitle')}
         </motion.h2>
         <p className="text-stone-400 mt-4 max-w-md mx-auto">
-          Join thousands of travelers discovering authentic stays across historic routes.
+          {t('ctaDescription')}
         </p>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.98 }}
           className="mt-8 px-10 py-4 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold rounded-xl shadow-xl shadow-amber-950/40"
         >
-          Create Free Account
+          {t('ctaButton')}
         </motion.button>
       </section>
 
@@ -242,37 +244,37 @@ export default function Page() {
       <footer className="relative z-10 px-6 py-16 border-t border-white/10 bg-black">
         <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8 text-stone-400">
           <div>
-            <h3 className="text-white font-bold text-lg tracking-wider">EthioStay</h3>
+            <h3 className="text-white font-bold text-lg tracking-wider">{t('footer.brand')}</h3>
             <p className="text-sm mt-2 leading-relaxed">
-              Luxury hotel booking platform inspired by classic East African hospitality.
+              {t('footer.description')}
             </p>
           </div>
           <div>
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider">Explore</h4>
+            <h4 className="text-white font-semibold text-sm uppercase tracking-wider">{t('footer.explore')}</h4>
             <ul className="mt-3 space-y-2 text-sm">
-              <li className="hover:text-amber-500 cursor-pointer transition">Hotels</li>
-              <li className="hover:text-amber-500 cursor-pointer transition">Destinations</li>
-              <li className="hover:text-amber-500 cursor-pointer transition">Offers</li>
+              <li className="hover:text-amber-500 cursor-pointer transition">{t('footer.links.hotels')}</li>
+              <li className="hover:text-amber-500 cursor-pointer transition">{t('footer.links.destinations')}</li>
+              <li className="hover:text-amber-500 cursor-pointer transition">{t('footer.links.offers')}</li>
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider">Support</h4>
+            <h4 className="text-white font-semibold text-sm uppercase tracking-wider">{t('footer.support')}</h4>
             <ul className="mt-3 space-y-2 text-sm">
-              <li className="hover:text-amber-500 cursor-pointer transition">Help Center</li>
-              <li className="hover:text-amber-500 cursor-pointer transition">Contact</li>
-              <li className="hover:text-amber-500 cursor-pointer transition">FAQ</li>
+              <li className="hover:text-amber-500 cursor-pointer transition">{t('footer.helpCenter')}</li>
+              <li className="hover:text-amber-500 cursor-pointer transition">{t('footer.contact')}</li>
+              <li className="hover:text-amber-500 cursor-pointer transition">{t('footer.faq')}</li>
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider">Legal</h4>
+            <h4 className="text-white font-semibold text-sm uppercase tracking-wider">{t('footer.legal')}</h4>
             <ul className="mt-3 space-y-2 text-sm">
-              <li className="hover:text-amber-500 cursor-pointer transition">Privacy Policy</li>
-              <li className="hover:text-amber-500 cursor-pointer transition">Terms</li>
+              <li className="hover:text-amber-500 cursor-pointer transition">{t('footer.privacy')}</li>
+              <li className="hover:text-amber-500 cursor-pointer transition">{t('footer.terms')}</li>
             </ul>
           </div>
         </div>
         <p className="text-center text-stone-600 mt-12 text-xs tracking-wide">
-          &copy; {new Date().getFullYear()} EthioStay. All rights reserved.
+          &copy; {new Date().getFullYear()} {t('footer.brand')}. {t('footer.rights')}
         </p>
       </footer>
 

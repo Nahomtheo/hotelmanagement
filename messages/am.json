@@ -1,0 +1,290 @@
+{
+  "nav": {
+    "brand": "ኢትዮስቴይ",
+    "links": {
+      "rooms": "ክፍሎች",
+      "destinations": "መድረሻዎች",
+      "offers": "ቅናሽዎች",
+      "culture": "ባህል"
+    },
+    "welcome": "እንኳን ደህና መጡ, {name}!",
+    "signIn": "ግባ",
+    "signOut": "ውጣ",
+    "register": "መዝግብ",
+    "menuLabel": "ምናሌ ክፈት/ዝጋ"
+  },
+  "auth": {
+    "login": {
+      "title": "እንኳን በደህና መጡ",
+      "subtitle": "ቀጣይ ቆይታዎን ለመቀጠል ይግቡ",
+      "email": "ኢሜል",
+      "password": "የይለፍ ቃል",
+      "emailPlaceholder": "ኢሜልዎን ያስገቡ",
+      "passwordPlaceholder": "የይለፍ ቃልዎን ያስገቡ",
+      "submit": "ግባ",
+      "submitLoading": "በመግባት ላይ...",
+      "forgotPassword": "የይለፍ ቃል ረስተዋል?",
+      "noAccount": "መለያ የለዎትም?",
+      "registerLink": "ፍጠር",
+      "errors": {
+        "invalidCredentials": "የተሳሳተ ኢሜል ወይም የይለፍ ቃል",
+        "generic": "አሁን መግባት አይቻልም"
+      }
+    },
+    "register": {
+      "title": "መለያ ፍጠር",
+      "subtitle": "ኢትዮስቴይን ተቀላቅለው ቀጣይ ቆይታዎን ይመዝግቡ",
+      "firstName": "የመጀመሪያ ስም",
+      "lastName": "የመጨረሻ ስም",
+      "email": "ኢሜል",
+      "phone": "ስልክ",
+      "password": "የይለፍ ቃል",
+      "confirmPassword": "የይለፍ ቃል ያረጋግጡ",
+      "emailPlaceholder": "ኢሜልዎን ያስገቡ",
+      "phonePlaceholder": "ስልክ ቁጥርዎን ያስገቡ",
+      "passwordPlaceholder": "የይለፍ ቃል ይፍጠሩ",
+      "submit": "መለያ ፍጠር",
+      "submitLoading": "መለያ በመፍጠር ላይ...",
+      "haveAccount": "መለያ አለዎት?",
+      "signInLink": "ግባ",
+      "success": "መለያ በተሳካ ሁኔታ ተፈጥሯል",
+      "errors": {
+        "passwordMismatch": "የይለፍ ቃላት አይመሳሰሉም",
+        "registrationFailed": "መመዝገብ አልተሳካም",
+        "generic": "መለያ በአሁኑ ጊዜ መፍጠር አይቻልም"
+      }
+    }
+  },
+  "home": {
+    "exploreTitle": "ይጎብኙ",
+    "exploreHighlight": "ኢትዮጵያ",
+    "places": {
+      "lalibela": { "name": "ላሊቤላ", "desc": "የድንጋይ ቅርንጫፍ ቤተ ክርስቲያን እና ጥንታዊ ቅርስ" },
+      "gondar": { "name": "ጎንደር", "desc": "የኢትዮጵያ ነገሥታት ቤተ መንግሥት" },
+      "simien": { "name": "ሲሚየን ተራሮች", "desc": "አስደናቂ መልክ እና የእንስሳት ሕይወት" }
+    },
+    "roomsTitle": "የከፍተኛ",
+    "roomsHighlight": "ክፍሎች",
+    "roomCards": {
+      "deluxe": { "name": "ዲሉክስ ሱይት" },
+      "executive": { "name": "ኢክሰኩቲቭ ክፍል" },
+      "royal": { "name": "ሮያል ሱይት" }
+    },
+    "viewDetails": "ዝርዝሮች ይመልከቱ",
+    "stats": {
+      "boutique": "ቡቲክ ቆይታዎች",
+      "guests": "ደስተኛ እንግዶች",
+      "satisfaction": "የእርካታ መጠን"
+    },
+    "amenitiesTitle": "የሆቴል",
+    "amenitiesHighlight": "አገልግሎቶች",
+    "amenities": {
+      "freeWifi": "ነፃ ዋይ-ፋይ",
+      "breakfast": "እንጀራ የተካተተ",
+      "airportPickup": "ወደ አውሮፕላን ማምጫ",
+      "support": "24/7 ድጋፍ",
+      "spa": "ስፓ እና የጤና አገልግሎት",
+      "cityTours": "የከተማ ጉብኝት",
+      "roomService": "የክፍል አገልግሎት",
+      "transport": "የከፍተኛ መጓጓዣ"
+    },
+    "testimonialsTitle": "እንግዶች",
+    "testimonialsHighlight": "ምን ይላሉ",
+    "testimonials": {
+      "sarah": { "name": "ሳራ", "text": "በጣም ያስደስተኛ ተሞክሮ ነበር። የኢትዮጵያ እንግዶች አገልግሎት አስደናቂ ነው።" },
+      "daniel": { "name": "ዳንኤል", "text": "የከፍተኛ ክፍሎች እና አስደናቂ ቦታዎች። በጣም ይመከራል!" },
+      "amina": { "name": "አሚና", "text": "ለኢትዮጵያ በጣም ጥሩ የታመነ ቀጠሮ መስተጋብር መሣሪያ ነው።" }
+    },
+    "ctaTitle": "ኢትዮጵያን ለማግኘት ዝግጁ ነዎት?",
+    "ctaDescription": "በከፍተኛ ቦታዎች ላይ በመዳሰስ በሺዎች የሚቆጠሩ እንግዶች ይቀላቀሉ።",
+    "ctaButton": "ነፃ መለያ ፍጠር",
+    "footer": {
+      "brand": "ኢትዮስቴይ",
+      "description": "በኢትዮጵያ ባህል ላይ የተመሰረተ የከፍተኛ ሆቴል ቅድመ ታሪክ መስተጋብር መሣሪያ ነው።",
+      "explore": "ይጎብኙ",
+      "links": {
+        "hotels": "ሆቴሎች",
+        "destinations": "መድረሻዎች",
+        "offers": "ቅናሽዎች"
+      },
+      "support": "ድጋፍ",
+      "helpCenter": "የእርዳታ ማዕከል",
+      "contact": "እውቂያ",
+      "faq": "ተደጋጋሚ ጥያቄዎች",
+      "legal": "ህጋዊ",
+      "privacy": "የግላዊነት ፖሊሲ",
+      "terms": "ውሎች",
+      "rights": "ሁሉም መብቶች ተጠብቀዋል።"
+    }
+  },
+  "roomsPage": {
+    "title": "የሚገኙ ክፍሎች",
+    "checkInDate": "ማስገቢያ ቀን",
+    "checkOutDate": "መውጫ ቀን",
+    "loading": "የሚገኙ ቦታዎችን በማዘጋጀት ላይ...",
+    "noImage": "ምስል የለም",
+    "roomLabel": "ክፍል {number}",
+    "status": {
+      "available": "ይገኛል",
+      "unavailable": "አይገኝም"
+    },
+    "suite": "ሱይት",
+    "accommodates": "እስከ {count} እንግዶች ይቀበላል",
+    "defaultDescription": "ለዚህ ክፍል ዝርዝር አልተሰጠም።",
+    "pricePerNight": "በሌሊት ዋጋ",
+    "bookButton": "ክፍል ይቀያየሩ",
+    "reserveTitle": "ክፍል {number} ይመዝግቡ",
+    "reserveSubtitle": "የተመዘገበውን አገልግሎት ለማስተናገድ ዝርዝሮች ያስገቡ።",
+    "selectedSuite": "የተመረጠ ሱይት",
+    "room": "ክፍል",
+    "rate": "ዋጋ",
+    "night": "ሌሊት",
+    "guestName": "የእንግዶች ስም",
+    "email": "ኢሜል አድራሻ",
+    "phone": "ስልክ ቁጥር",
+    "nationality": "ዜግነት",
+    "nationalityPlaceholder": "-- ዜግነት ይምረጡ --",
+    "checkIn": "ግባ",
+    "checkOut": "ውጣ",
+    "durationMetrics": "የቆይታ ጊዜ: {nights} ሌሊቶች",
+    "totalCost": "ጠቅላላ: ${total}",
+    "numberOfGuests": "ብዛት ያላቸው እንግዶች",
+    "reasonOfStay": "የቆይታ ምክንያት",
+    "passportNumber": "የፓስፖርት ቁጥር",
+    "idNumber": "የመታወቂያ ቁጥር",
+    "specialRequests": "ልዩ መጠየቂያዎች",
+    "specialRequestsPlaceholder": "የአውሮፕላን አገልግሎት እና ልዩ መጠየቂያዎች...",
+    "cancel": "ተወው",
+    "confirmReservation": "ቀጠሮ ያረጋግጡ",
+    "alerts": {
+      "bookingSuccess": "ቀጠሮ በተሳካ ሁኔታ ተፈጥሯል!",
+      "bookingFailed": "ቀጠሮ አልተሳካም",
+      "createBookingFailed": "ቀጠሮ መፍጠር አልተሳካም"
+    }
+  },
+  "dashboard": {
+    "loading": "ኢትዮስቴይን በመጫን ላይ...",
+    "quickActions": {
+      "browseRooms": {
+        "title": "ክፍሎች ይመልከቱ",
+        "description": "የተመረጡ የክፍል እና ልዩ ቦታዎችን ይመልከቱ።"
+      },
+      "myBookings": {
+        "title": "የእኔ ቀጠሮዎች",
+        "description": "የቀጠሮ ጊዜዎችን ይመልከቱ።"
+      },
+      "myProfile": {
+        "title": "የእኔ መገለጫ",
+        "description": "የቅድመ አስተዳደር ምርጫዎችን ይለውጡ።"
+      }
+    },
+    "recentBookings": {
+      "title": "የቅርብ ጊዜ ቀጠሮዎች",
+      "loading": "የቀጠሮ ታሪክን በመጫን ላይ...",
+      "empty": "ምንም ንቁ ቀጠሮዎች የሉም።",
+      "browseRooms": "ክፍሎችን ይመልከቱ"
+    },
+    "table": {
+      "room": "ክፍል",
+      "checkIn": "ግባ",
+      "checkOut": "ውጣ",
+      "status": "ሁኔታ",
+      "totalBill": "ጠቅላላ መጠን",
+      "roomLabel": "ክፍል {number}"
+    }
+  },
+  "receptionist": {
+    "title": "አገልግሎት ቤት",
+    "subtitle": "የፊት ለፊት ተግባር",
+    "cards": {
+      "checkIn": {
+        "title": "የግቢ ቀጠሮዎችን ያስተናግዱ",
+        "description": "የመጡትን ቀጠሮዎች ያረጋግጡ እና የክፍል ቁልፍ ያስተናግዱ።"
+      },
+      "departures": {
+        "title": "መውጫ ያስተናግዱ",
+        "description": "የስብሰባ መረጃዎችን ያስተናግዱ እና ክፍሎችን ይመልሱ።"
+      },
+      "policeReport": {
+        "title": "የፖሊስ ሪፖርት ፍጠር",
+        "description": "የእንግዶች ዝርዝር እና ቆይታዎችን ወደ ፖሊስ ለማስተላለፍ ይመረጡ።"
+      }
+    },
+    "operationsTitle": "የዛሬ ስራዎች",
+    "operationsSubtitle": "ለዕቅድ ቀጠሮዎች የማረጋገጫ ሰሌዳ",
+    "loading": "ከማዕከላዊ ንብረት አስተዳደር ጋር በማመሳሰል ላይ...",
+    "empty": "ለዚህ ዑደት ምንም ስራ አልተመዘገበም።",
+    "table": {
+      "bookingDate": "ቀን",
+      "guestFolio": "የእንግዶች ዝርዝር",
+      "suite": "ክፍል",
+      "itinerary": "መርሃ ግብር",
+      "status": "ሁኔታ",
+      "preferences": "ምርጫዎች",
+      "verification": "ማረጋገጫ",
+      "deskAction": "የቤት እርምጃ"
+    }
+  },
+  "admin": {
+    "title": "የአስተዳደር ፓነል",
+    "welcome": "እንኳን ደህና መጡ, አስተዳደር!",
+    "stats": {
+      "totalBookings": "ጠቅላላ ቀጠሮዎች",
+      "totalUsers": "ጠቅላላ ተጠቃሚዎች",
+      "totalRevenue": "ጠቅላላ ገቢ",
+      "occupancyRate": "የተሞላ መጠን"
+    },
+    "links": {
+      "manageRooms": {
+        "title": "ክፍሎችን አስተዳድር",
+        "description": "ክፍሎችን ፍጠር እና አስተዳድር"
+      },
+      "manageBookings": {
+        "title": "ቀጠሮዎችን አስተዳድር",
+        "description": "ሁሉንም ቀጠሮዎች ይመልከቱ"
+      },
+      "manageUsers": {
+        "title": "ተጠቃሚዎችን አስተዳድር",
+        "description": "የተጠቃሚ መለያዎችን ይመልከቱ"
+      },
+      "reports": {
+        "title": "ሪፖርቶች",
+        "description": "የገቢ እና የተሞላ መጠን ሪፖርቶች"
+      }
+    }
+  },
+  "adminRooms": {
+    "title": "ክፍሎችን አስተዳድር",
+    "createRoom": "አዲስ ክፍል ፍጠር",
+    "updateRooms": "የነበሩ ክፍሎችን አስተካክል",
+    "selectRoom": "ለመጀመሪያ ጊዜ ክፍል ከዚህ ዝርዝር ይምረጡ።",
+    "editRoom": "ክፍል አስተካክል",
+    "noRooms": "ምንም ክፍሎች የሉም።",
+    "editingRoom": "ክፍል ዝርዝር አስተካክር: {number}",
+    "backToList": "ወደ ዝርዝር ይመለሱ"
+  },
+  "policeReport": {
+    "print": "አትም / PDF እንደ ማስቀመጥ",
+    "title": "የፖሊስ ሪፖርት",
+    "managerDetails": "የአስተዳዳሪ ዝርዝር",
+    "ownerDetails": "የባለቤት ዝርዝር",
+    "name": "ስም",
+    "phone": "ስልክ",
+    "guestName": "የእንግዶች ስም",
+    "nationality": "ዜግነት",
+    "passport": "የፓስፖርት ቁጥር",
+    "idNumber": "የመታወቂያ ቁጥር",
+    "phoneNo": "የስልክ ቁጥር",
+    "checkIn": "ግባ",
+    "checkOut": "ውጣ",
+    "reason": "የቆይታ ምክንያት",
+    "action": "እርምጃ",
+    "edit": "አስተካክል",
+    "save": "አስቀምጥ",
+    "checkedByHotel": "በሆቴል ሰራተኞች የተፈተሸ",
+    "checkedByPolice": "በፖሊስ ክፍል የተፈተሸ",
+    "position": "ቦታ",
+    "signature": "ፊርማ",
+    "date": "ቀን"
+  }
+}

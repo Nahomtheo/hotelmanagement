@@ -7,6 +7,7 @@ import { errorResponse, successResponse } from '@/lib/utils/errorHandler';
 import { roomCreationSchema } from '@/lib/validations';
 import { authOptions } from '@/lib/auth';
 import Booking from '@/lib/mongodb/models/Booking';
+import { string } from 'zod';
 
 export async function GET(req: NextRequest) {
   try {
@@ -14,8 +15,8 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const type = searchParams.get('type');
-    const checkIn = searchParams.get('checkIn');
-    const checkOut = searchParams.get('checkOut');
+    const checkIn = searchParams.get('checkInDate');
+    const checkOut = searchParams.get('checkOutDate');
 
     await connectDB();
 
@@ -26,13 +27,18 @@ export async function GET(req: NextRequest) {
     }
 
     // If checking availability
-    if (checkIn && checkOut) {
-      const checkInDate = new Date(checkIn);
-      const checkOutDate = new Date(checkOut);
+if (checkIn && checkOut) {
+    const checkInDate = new Date(checkIn);
+    const checkOutDate = new Date(checkOut);
 
-      // This is simplified - in production, you'd check Booking model
-      query.status = 'available';
-    }
+    const conflictingBookings = await Booking.find({
+        status: { $in: ["confirmed", "checked_in"] },
+       checkInDate : { $lt: checkOutDate },
+        checkOutDate: { $gt: checkInDate },
+    }).distinct("roomId");
+
+  query._id =  { $nin: conflictingBookings }
+}
 
     const skip = (page - 1) * limit;
     const rooms = await Room.find(query)
@@ -48,7 +54,7 @@ export async function GET(req: NextRequest) {
 });
   await Promise.all(expiredBookings.map(async (booking) => {
     await Booking.findByIdAndUpdate(booking._id, { status: 'cancelled' });
-    await Room.findByIdAndUpdate(booking.roomId, { status: 'available' });
+    ;
   }));
 
     const total = await Room.countDocuments(query);

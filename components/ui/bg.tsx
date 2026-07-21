@@ -52,9 +52,7 @@ export default function ThreeDBackground() {
           transform: `translate3d(${coords.x * -10}px, ${coords.y * -10}px, 20px)`
         }}
       >
-        <div className="flex items-center gap-2 font-bold text-xl tracking-wider text-amber-500">
-          <span>🇪🇹</span> EthioStay
-        </div>
+       
     
       </header>
 
@@ -65,7 +63,7 @@ export default function ThreeDBackground() {
           transform: `translate3d(${coords.x * 15}px, ${coords.y * 15}px, 50px) rotateX(${coords.y * -4}deg) rotateY(${coords.x * 4}deg)`
         }}
       >
-        <span className="text-amber-500 uppercase tracking-widest text-sm font-semibold mb-3 block">
+        <span className="text-amber-500 uppercase tracking-widest text-sm font-semibold mb-3 block mt-8">
           Welcome to East Africa
         </span>
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight mb-6 bg-gradient-to-r from-white via-stone-200 to-stone-400 bg-clip-text text-transparent">

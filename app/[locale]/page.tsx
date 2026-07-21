@@ -29,14 +29,19 @@ export default function Page() {
 
   return (
     <main className="relative min-h-screen overflow-hidden text-white bg-black [perspective:1400px]">
-      
-      {/* 
-        3D Dynamic Background Layer 
-        (Handles Hero Title, Sign In/Register navigation & Initial Viewport View)
-      */}
-      <div className="relative w-full h-screen">
+      <div className="relative w-full min-h-[92vh]">
         <ThreeDBackground />
+       
       </div>
+       <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+            
+              <Link
+                href="/rooms"
+                className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/10 px-8 py-3 text-sm text-white hover:bg-white/20 transition"
+              >
+                View rooms
+              </Link>
+            </div>
 
       {/* ================= EXPLORE SECTION (WITH 3D TILT EFFECT) ================= */}
       <section className="relative z-10 px-6 py-24 max-w-7xl mx-auto mt-12">
@@ -232,11 +237,12 @@ export default function Page() {
           {t('ctaDescription')}
         </p>
         <motion.button
+          
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.98 }}
           className="mt-8 px-10 py-4 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold rounded-xl shadow-xl shadow-amber-950/40"
-        >
-          {t('ctaButton')}
+        > <a href="/auth/register"> {t('ctaButton')}</a>
+          
         </motion.button>
       </section>
 

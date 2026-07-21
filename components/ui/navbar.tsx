@@ -15,7 +15,7 @@ export default function ModernNavbar() {
 
   const links = [
     { key: 'rooms', label: t('links.rooms') },
-    { key: 'destinations', label: t('links.destinations') },
+    { key: 'dashboard', label: t('links.dashboard') },
     { key: 'offers', label: t('links.offers') },
     { key: 'culture', label: t('links.culture') },
   ];
@@ -29,7 +29,7 @@ export default function ModernNavbar() {
       >
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-2 font-black text-xl tracking-wider text-amber-400">
-          <span>🇪🇹</span>
+    
           <span>{t('brand')}</span>
         </Link>
 
@@ -47,6 +47,7 @@ export default function ModernNavbar() {
           <LanguageSwitcher/>
           {user ? (
             <>
+              
               <span className="text-zinc-400">{t('welcome', { name: user.name as string })}</span>
               <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-white/5 rounded-xl" onClick={() => signOut()}>
                 {t('signOut')}

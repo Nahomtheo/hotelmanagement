@@ -124,6 +124,7 @@ export async function createBooking(
     if (!room || room.isDeleted) {
       throw new Error('Room not found');
     }
+  
 
     // Check availability
     const isAvailable = await checkRoomAvailability(roomId, checkInDate, checkOutDate);
@@ -170,7 +171,7 @@ export async function createBooking(
    
 
     // Update room status
-    await Room.findByIdAndUpdate(roomId, { status: 'occupied' });
+    await Room.findByIdAndUpdate(roomId, { status: 'reserved' });
   
 
     // Send confirmation email

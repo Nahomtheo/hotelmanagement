@@ -34,7 +34,7 @@ export const bookingValidationSchema = z.object({
 
 export const roomCreationSchema = z.object({
   roomNumber: z.string().min(1, 'Room number is required'),
-  type: z.enum(['single', 'double', 'suite', 'deluxe']),
+  type: z.enum(['single', 'double', 'suite', 'deluxe','conference hall']),
   pricePerNight: z.number().min(0, 'Price must be positive'),
   maxGuests: z.number().min(1),
   amenities: z.array(z.string()).default([]),

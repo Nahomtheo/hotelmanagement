@@ -7,6 +7,7 @@ import { bookingValidationSchema } from '@/lib/validations';
 import { createBooking, checkInGuest, checkOutGuest } from '@/lib/services/bookingService';
 import { authOptions } from '@/lib/auth';
 import Room from '@/lib/mongodb/models/Room';
+import { isRoomAvailable } from '@/lib/services/roomService';
 
 export async function GET(req: NextRequest) {
   try {
@@ -33,6 +34,7 @@ export async function GET(req: NextRequest) {
       query.userId = (session?.user as any)?.id;
     }
       const skip = (page - 1) * limit;
+      console.log('user id for booking',(session?.user as any)?.id)
     
     const bookings = await Booking.find(query)
       .skip(skip)
@@ -118,7 +120,15 @@ export async function POST(req: NextRequest) {
       specialRequests,
        passport_no,
       id_no,)
-
+console.log('user id for booking',(session?.user as any)?.id)
+     const roomIsavailable= await isRoomAvailable(body.roomId,new Date(body.checkInDate),new Date(body.checkOutDate))
+   if (!roomIsavailable) {
+  return NextResponse.json(
+    errorResponse("Sorry, the room is already booked for the selected dates"),
+    { status: 409 }
+  );
+}
+    
     // Create booking
     const booking = await createBooking(
       body.roomId,
@@ -138,7 +148,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       successResponse(booking, 'Booking created successfully', 201),
-      { status: 201 }
+      { status: 200}
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to create booking';
@@ -148,4 +158,5 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
+
 }

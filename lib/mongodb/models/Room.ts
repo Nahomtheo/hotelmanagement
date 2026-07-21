@@ -3,7 +3,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface IRoom extends Document {
   hotelId: mongoose.Types.ObjectId;
   roomNumber: string;
-  type: 'single' | 'double' | 'suite' | 'deluxe';
+  type: 'single' | 'double' | 'suite' | 'deluxe'|'conference hall';
   pricePerNight: number;
   maxGuests: number;
   amenities: string[];
@@ -12,7 +12,7 @@ export interface IRoom extends Document {
       publicId: String
     }];
   description: string;
-  status: 'available' | 'occupied' | 'maintenance';
+  status: 'available' | 'occupied' | 'reserved '|'being cleaned'|'maintenance';
   isDeleted: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -33,7 +33,7 @@ const roomSchema = new Schema<IRoom>(
     },
     type: {
       type: String,
-      enum: ['single', 'double', 'suite', 'deluxe'],
+      enum: ['single', 'double', 'suite', 'deluxe','conference hall'],
       required: true,
     },
     pricePerNight: {
@@ -57,7 +57,7 @@ const roomSchema = new Schema<IRoom>(
     },
     status: {
       type: String,
-      enum: ['available', 'occupied', 'maintenance'],
+      enum: ['available', 'occupied', 'reserved','being cleaned','maintenance'],
       default: 'available',
       index: true,
     },

@@ -1,9 +1,9 @@
 {
   "nav": {
-    "brand": "EthioStay",
+    "brand": "MW Hotel",
     "links": {
       "rooms": "Rooms",
-      "destinations": "Destinations",
+      "dashboard": "Dashboard",
       "offers": "Offers",
       "culture": "Culture"
     },
@@ -33,7 +33,7 @@
     },
     "register": {
       "title": "Create Account",
-      "subtitle": "Join EthioStay and book your next stay",
+      "subtitle": "Join MW Hotel and book your next stay",
       "firstName": "First Name",
       "lastName": "Last Name",
       "email": "Email",
@@ -98,8 +98,9 @@
     "ctaTitle": "Ready to Experience Ethiopia?",
     "ctaDescription": "Join thousands of travelers discovering authentic stays across historic routes.",
     "ctaButton": "Create Free Account",
+    "bookButton": "Book Sanctuary",
     "footer": {
-      "brand": "EthioStay",
+      "brand": "MW Hotel",
       "description": "Luxury hotel booking platform inspired by classic East African hospitality.",
       "explore": "Explore",
       "links": {
@@ -163,7 +164,7 @@
     }
   },
   "dashboard": {
-    "loading": "LOADING ETHIOSTAY...",
+    "loading": "LOADING MW HOTEL...",
     "quickActions": {
       "browseRooms": {
         "title": "Browse Rooms",

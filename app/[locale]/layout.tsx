@@ -17,9 +17,9 @@ const geistMono = Geist_Mono({
 const locales = ['en', 'am'];
 
 export const metadata: Metadata = {
-  title: 'Hotel Booking System',
-  description: 'Professional hotel booking and management system',
-  generator: 'v0.app',
+  title: 'MW Hotel',
+  description: 'MW Hotel booking and management system',
+  generator: 'MW Hotel App',
   icons: {
     icon: [
       {
@@ -59,7 +59,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased bg-zinc-950 text-zinc-100 selection:bg-amber-500/30">
         {/* 4. Provide locale translation context to client components */}
         <NextIntlClientProvider messages={messages}>
           <Providers>

@@ -35,19 +35,30 @@ export default function RoomsPage() {
     fetchRooms();
   }, []);
 
-  const fetchRooms = async () => {
-    try {
-      const res = await fetch('/api/rooms');
-      const data = await res.json();
-      if (data.success) {
-        setRooms(data.data.rooms);
-      }
-    } catch (error) {
-      console.error('Error fetching rooms:', error);
-    } finally {
-      setLoading(false);
+const fetchRooms = async () => {
+  try {
+    const query = new URLSearchParams();
+
+    if (checkInDate && checkOutDate) {
+      query.append("checkInDate", checkInDate);
+      query.append("checkOutDate", checkOutDate);
     }
-  };
+
+    const res = await fetch(`/api/rooms?${query.toString()}`);
+    const data = await res.json();
+
+    if (data.success) {
+      setRooms(data.data.rooms);
+    }
+  } catch (error) {
+    console.error("Error fetching rooms:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+useEffect(() => {
+  fetchRooms();
+}, [checkInDate, checkOutDate]);
 
   const handleBookRoom = (room: any) => {
     if (!(session?.user as any)?.id) {
@@ -100,7 +111,12 @@ export default function RoomsPage() {
   };
 
   return (
-    <div className="relative min-h-screen text-zinc-100 overflow-hidden font-sans selection:bg-amber-500/30">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, ease: 'easeOut' }}
+      className="relative min-h-screen text-zinc-100 overflow-hidden font-sans selection:bg-amber-500/30"
+    >
       
       {/* Immersive Ethiopian Highlands Sunset Background Overlay */}
       <div 
@@ -116,7 +132,7 @@ export default function RoomsPage() {
        
 
         {/* Content Wrapper */}
-        <div className="max-w-7xl mx-auto px-6 py-16 w-full flex-1">
+        <div className="max-w-7xl mx-auto px-6 py-24 w-full flex-1">
           
           {/* Header & Date Pickers */}
           <div className="mb-12  flex flex-col md:flex-row md:items-center md:justify-between gap-6 mt-6">
@@ -401,6 +417,6 @@ export default function RoomsPage() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }

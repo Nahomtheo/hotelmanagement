@@ -57,6 +57,8 @@ const fetchRooms = async () => {
   }
 };
 useEffect(() => {
+  if (!checkInDate || !checkOutDate) return;
+
   fetchRooms();
 }, [checkInDate, checkOutDate]);
 

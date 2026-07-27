@@ -1,6 +1,8 @@
 import { connectDB } from '../mongodb';
 import Booking, { IBooking } from '../mongodb/models/Booking';
+import FoodOrder from '../mongodb/models/FoodOrder';
 import Room, { IRoom } from '../mongodb/models/Room';
+import mongoose from 'mongoose';
 import User from '../mongodb/models/User';
 import { calculateNights, calculateTotalPrice, checkDateOverlap } from '../utils/dateHelpers';
 import { sendBookingConfirmation, createNotification, sendBookingCancellation } from './notificationService';
@@ -289,6 +291,22 @@ export async function checkInGuest(bookingId: string): Promise<IBooking> {
 export async function checkOutGuest(bookingId: string): Promise<IBooking> {
   try {
     await connectDB();
+    const unpaidOrders = await FoodOrder.find({
+  booking_Id:new mongoose.Types.ObjectId(bookingId),
+  paymentStatus: "pending",
+  isDeleted: false,
+});
+
+const unpaidAmount = unpaidOrders.reduce(
+  (sum, order) => sum + order.totalPrice,
+  0
+);
+
+if (unpaidAmount > 0) {
+  throw new Error(
+    `Guest has unpaid restaurant charges of $${unpaidAmount}.`
+  );
+}
 
     const booking = await Booking.findById(bookingId);
     if (!booking || booking.isDeleted) {
@@ -298,6 +316,7 @@ export async function checkOutGuest(bookingId: string): Promise<IBooking> {
     if (booking.status !== 'checked_in') {
       throw new Error('Only checked-in guests can be checked out');
     }
+
 
     booking.status = 'checked_out';
     await booking.save();

@@ -4,6 +4,7 @@ import Food from "@/lib/mongodb/models/Food";
 import FoodOrder from "../mongodb/models/FoodOrder";
 import TableReservation from "../mongodb/models/TableReservation";
 import Room from "../mongodb/models/Room";
+import Table from '../mongodb/models/Table';
 
 export interface ImagesData{
   url:string,
@@ -28,7 +29,7 @@ export interface FoodOrderItem {
 }
 
 export interface FoodOrderData {
-    userId:string;
+  userId:string;
   tableId?: string | mongoose.Types.ObjectId;
   booking_id:string | mongoose.Types.ObjectId;
   roomId?: string | mongoose.Types.ObjectId;
@@ -108,7 +109,8 @@ for (const food of data.foods) {
       status: data.status || 'pending',
       specialReq: data.specialReq || '',
     });
-      // TODO: Replace with your DB operation (e.g., await FoodOrder.create(newOrder))
+    if (data.tableId) await Table.findByIdAndUpdate(data.tableId,{status:"occupied"})
+     
       return { success: true, data: orderedFood };
     } catch (error: any) {
       return { success: false, error: error.message };

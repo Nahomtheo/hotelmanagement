@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createFoodOrder} from "@/lib/services/restaurantService"; // Adjust import path
 import Food from "@/lib/mongodb/models/Food"; // Adjust import path
 import { connectDB } from '@/lib/mongodb';
+import { get } from "http";
+import FoodOrder from "@/lib/mongodb/models/FoodOrder";
 
 /**
  * POST /api/food
@@ -37,17 +39,29 @@ export async function POST(req: NextRequest) {
  * GET /api/food
  * Get all active menu items
  */
-export async function GET() {
+export async function GET(req:Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("tableId");
+    const paymentStatus=searchParams.get("paymentStatus")
+    const filter: any = { isDeleted: { $ne: true } };
+
+    if (id){
+      filter.tableId = id;
+    }
+    if(paymentStatus){
+      filter.paymentStatus=paymentStatus
+    }
     await connectDB()
 
-    const menuItems = await Food.find({ isDeleted: { $ne: true } })
-    .populate('foods.foodId' )
+    const foodorder = await FoodOrder.find(filter)
+    .populate('foods.foodId' , 'name ,category' )
     .sort({createdAt: -1,})
     .lean()
+    console.log(foodorder,": this are food order from api")
 
     return NextResponse.json(
-      { success: true, data: menuItems },
+      { success: true, data: foodorder },
       { status: 200 }
     );
   } catch (error: any) {

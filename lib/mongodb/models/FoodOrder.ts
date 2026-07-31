@@ -9,7 +9,7 @@ export interface IFoodOrder extends Document {
   foods: [
     {
       foodId:  mongoose.Types.ObjectId;
-      foodName:string
+     
       quantity: number;
       price: number;
     }
@@ -27,6 +27,7 @@ export interface IFoodOrder extends Document {
     | "cancelled";
 
   notes?: string;
+  takeaway?:boolean;
   isDeleted: boolean;
 
   createdAt: Date;
@@ -58,10 +59,7 @@ const FoodOrderSchema = new Schema<IFoodOrder>(
           ref: "Food",
           required: true,
         },
-        foodName:{
-          type:String,
-          ref:'FoodName'
-        },
+      
 
         quantity: {
           type: Number,
@@ -107,6 +105,9 @@ const FoodOrderSchema = new Schema<IFoodOrder>(
 
     notes: {
       type: String,
+    },
+    takeaway:{
+      type:Boolean
     },
 
     isDeleted: {

@@ -4,18 +4,39 @@ import Food from "@/lib/mongodb/models/Food"; // Adjust import path
 import { connectDB } from '@/lib/mongodb';
 import { get } from "http";
 import FoodOrder from "@/lib/mongodb/models/FoodOrder";
+import Booking from "@/lib/mongodb/models/Booking";
 
-/**
- * POST /api/food
- * Create a new menu item
- */
+
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    console.log (body,'this are the sent bodies')
+    console.log(body, "these are the sent bodies");
 
-    const result = await createFoodOrder(body);
+    let payload = { ...body };
 
+    // 1. If ordering for a room, find the active booking
+    if (body.roomId) {
+      const activeBooking = await Booking.findOne({
+        roomId: body.roomId,
+        status: "checked_in", // Only match current guest
+      }).sort({ createdAt: -1 });
+
+      if (!activeBooking) {
+        return NextResponse.json(
+          { success: false, error: "No active checked-in booking found for this room." },
+          { status: 404 }
+        );
+      }
+
+      // Attach the booking ID cleanly
+      payload.booking_id = activeBooking._id;
+    }
+
+    // 2. Create the order with updated payload
+    const result = await createFoodOrder(payload);
+
+    // 3. Handle failure
     if (!result.success) {
       return NextResponse.json(
         { success: false, error: result.error },
@@ -23,13 +44,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 4. Return success response (runs for BOTH room and table orders)
     return NextResponse.json(
       { success: true, data: result.data },
       { status: 201 }
     );
   } catch (error: any) {
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to create menu item" },
+      {
+        success: false,
+        error: error.message || "Failed to create order",
+      },
       { status: 500 }
     );
   }

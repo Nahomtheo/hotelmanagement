@@ -138,8 +138,13 @@ export async function createBooking(
     if (checkOutDate <= checkInDate) {
       throw new Error('Check-out date must be after check-in date');
     }
-
-    if (checkInDate < new Date()) {
+const inputDate = new Date(checkInDate);
+    const today = new Date();
+    
+    // Reset time components to 00:00:00 for a fair date-only comparison
+    inputDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0)
+    if (inputDate  < today) {
       throw new Error('Check-in date cannot be in the past');
     }
 
@@ -291,12 +296,13 @@ export async function checkInGuest(bookingId: string): Promise<IBooking> {
 export async function checkOutGuest(bookingId: string): Promise<IBooking> {
   try {
     await connectDB();
-    const unpaidOrders = await FoodOrder.find({
-  booking_Id:new mongoose.Types.ObjectId(bookingId),
-  paymentStatus: "pending",
+
+const unpaidOrders = await FoodOrder.find({
+  booking_Id: new mongoose.Types.ObjectId(bookingId),
+  paymentStatus: { $in: ["pending", "onroom"] }, // Matches EITHER "pending" OR "onroom"
   isDeleted: false,
 });
-
+ console.log(unpaidOrders,'this are the unpaid orders')
 const unpaidAmount = unpaidOrders.reduce(
   (sum, order) => sum + order.totalPrice,
   0

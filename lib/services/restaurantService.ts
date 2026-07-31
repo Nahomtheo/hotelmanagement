@@ -29,9 +29,9 @@ export interface FoodOrderItem {
 }
 
 export interface FoodOrderData {
-  userId:string;
+  userId?:string;
   tableId?: string | mongoose.Types.ObjectId;
-  booking_id:string | mongoose.Types.ObjectId;
+  booking_id?:string | mongoose.Types.ObjectId;
   roomId?: string | mongoose.Types.ObjectId;
   foods: FoodOrderItem[];
   paymentStatus:'pending'|'paid'|'onroom';

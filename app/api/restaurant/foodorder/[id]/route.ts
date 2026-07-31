@@ -4,15 +4,13 @@ import FoodOrder from "@/lib/mongodb/models/FoodOrder";
 import { connectDB } from "@/lib/mongodb";
 import mongoose from "mongoose";
 import Table from "@/lib/mongodb/models/Table";
+import Booking from "@/lib/mongodb/models/Booking";
 
 interface RouteParams {
   params: { id: string };
 }
 
-/**
- * PUT /api/food/[id]
- * Update an existing menu item
- */
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -29,13 +27,35 @@ export async function PUT(
     }
 
     const updates = await req.json();
+        
+    
+        let payload = { ...updates };
+    
+        // 1. If ordering for a room, find the active booking
+        if (updates.roomId) {
+          const activeBooking = await Booking.findOne({
+            roomId: updates.roomId,
+            status: "checked_in", // Only match current guest
+          }).sort({ createdAt: -1 });
+    
+          if (!activeBooking) {
+            return NextResponse.json(
+              { success: false, error: "No active checked-in booking found for this room." },
+              { status: 404 }
+            );
+          }
+    
+          // Attach the booking ID cleanly
+          payload.booking_Id = activeBooking._id;
+        }
 
     // 2. Perform the order update
-    const updatedFoodorder = await FoodOrder.findByIdAndUpdate(id, updates, {
+    const updatedFoodorder = await FoodOrder.findByIdAndUpdate(id, payload, {
       new: true,
       runValidators: true,
     });
-console.log(updatedFoodorder?.tableId?.toString(),updates)
+console.log( payload,'this is the updated food order')
+
     const remainingUnpaidO= await FoodOrder.find({tableId: updatedFoodorder?.tableId,
   paymentStatus: 'pending'},)
   if (remainingUnpaidO.length === 0) {

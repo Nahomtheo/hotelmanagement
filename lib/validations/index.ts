@@ -22,13 +22,23 @@ export const bookingValidationSchema = z.object({
   nationality: z.string().min(1, 'Please select a nationality'),
 
   reasonOfStay: z.string().min(4,'please write your reason of stay'),
-  checkInDate: z.string().refine((date) => new Date(date) > new Date(), {
-    message: 'Check-in date must be in the future',
-  }),
+  checkInDate: z.string().refine(
+  (date) => {
+    const inputDate = new Date(date);
+    const today = new Date();
+    
+    // Reset time components to 00:00:00 for a fair date-only comparison
+    inputDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    return inputDate >= today;
+  },
+  { message: 'Check-in date cannot be in the past' }
+),
   checkOutDate: z.string(),
   numberOfGuests: z.number().min(1, 'At least one guest is required'),
   specialRequests: z.string().optional(),
-    passport_no : z.string().optional(),
+  passport_no : z.string().optional(),
   id_no : z.string().optional(),
 });
 

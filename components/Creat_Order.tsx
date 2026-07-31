@@ -44,19 +44,34 @@ const INITIAL_FORM_STATE: FoodOrderData & { foods: ExtendedCartItem[] } = {
   specialReq: "",
 };
 
-export default function Createorder({ tableId }: TableManagerProps) {
+type CreateOrderProps = 
+  | { tableId: string; roomId?: never; userId?: never }
+  | { roomId: string; tableId?: never; userId?: never }
+  | { userId: string; tableId?: never; roomId?: never };
+
+export default function Createorder({ tableId, roomId, userId }: CreateOrderProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [, setSelectedOrder] = useState<EditableTable | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<EditableTable | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [menu, setMenu] = useState<MenuItemData[]>([]);
   const [form, setForm] = useState(INITIAL_FORM_STATE);
   const [activeCategory, setActiveCategory] = useState<CategoryType>("all");
 
   // 1. Fetch menu on mount
-  useEffect(() => {
-    fetchMenu();
-  }, []);
+useEffect(() => {
+  // 1. Fetch menu data
+  fetchMenu();
+
+  // 2. Initialize form state with target IDs
+  setForm((prev) => ({
+    ...prev,
+    tableId: tableId || undefined,
+    roomId: roomId || undefined,
+    userId: userId || undefined,
+  }));
+}, [tableId, roomId, userId]);
+  
 
   const fetchMenu = async () => {
     try {
@@ -79,20 +94,22 @@ export default function Createorder({ tableId }: TableManagerProps) {
 
   // 3. Add to Cart
   const addToCart = (item: ExtendedCartItem) => {
+
     setForm((prev) => {
       const exists = prev.foods.some((f) => f.foodId === item.foodId);
+ 
 
       if (!exists) {
         return {
           ...prev,
-          tableId: tableId,
+          
           foods: [...prev.foods, { ...item, quantity: item.quantity || 1 }],
         };
       }
 
       return {
         ...prev,
-        tableId: tableId,
+        
         foods: prev.foods.map((f) =>
           f.foodId === item.foodId
             ? { ...f, quantity: f.quantity + (item.quantity || 1) }
@@ -106,7 +123,7 @@ export default function Createorder({ tableId }: TableManagerProps) {
   const removeFromCart = (ritem: ExtendedCartItem) => {
     setForm((prev) => ({
       ...prev,
-      tableId: tableId,
+     
       foods: prev.foods
         .map((item) =>
           item.foodId === ritem.foodId

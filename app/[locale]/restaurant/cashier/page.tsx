@@ -30,6 +30,11 @@ interface Order {
   status?: 'pending' | 'preparing' | 'ready' | 'served' | 'cancelled';
   specialReq?: string;
 }
+interface RoomData {
+  _id: string;
+  roomNumber: number;
+  currentOrder?: Order;
+}
 
 interface TableData {
   _id: string;
@@ -41,6 +46,7 @@ interface TableData {
   currentOrder?: Order;
 }
 
+
 export type TableStatus = 'occupied' | 'reserved' | 'available';
 
 export default function CashierPage() {
@@ -49,9 +55,17 @@ export default function CashierPage() {
   const [updateTReservation, setUpdateTReservation] = useState<ReservationData | null>(null);
   const [selectedTableO, setSelectedTableO] = useState<[]>([]);
   const [payment, setPayment] = useState<'pending' | 'paid' | 'onroom'>('pending');
+  const [updateroomOrderDisp, setUpdateroomOrderDisp] = useState(false);
   const [selectedTable, setSelectedTable] = useState<TableData | null>(null);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState<boolean>(false);
+  const [orderDisp, setOrderDisp] = useState<boolean>(false);
   const [openDropdownTableId, setOpenDropdownTableId] = useState<string | null>(null);
+   const [selectedTableId, setSelectedTableId] = useState<string>('');
+   const [rooms, setRooms] = useState<RoomData[]>([]);
+  const [onRoomId, setOnRoomId] = useState<string>('');
+   const [roomOrderDisp, setRoomOrderDisp] = useState(false);
+   const [selectedRoomId, setSelectedRoomId] = useState<string>('');
+
 
   // Form State for creating a new reservation on available tables
   const [reservationInput, setReservationInput] = useState({
@@ -75,9 +89,25 @@ export default function CashierPage() {
       setLoading(false);
     }
   };
+    const fetchRooms = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/rooms?', { method: 'GET' });
+      if (res.ok) {
+        const data = await res.json();
+        setRooms(data.data.rooms || []);
+        console.log(rooms,"roomss")
+      }
+    } catch (error) {
+      console.error('Error fetching tables:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchTables();
+    fetchRooms();
   }, []);
 
   // Submit/Update Reservation
@@ -110,7 +140,10 @@ export default function CashierPage() {
       const res = await fetch(`/api/restaurant/foodorder/${params}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentStatus:payment }),
+        body: JSON.stringify({ 
+          paymentStatus:payment ,
+          roomId:onRoomId
+        }),
       });
       if (res.ok) {
         setIsOrderModalOpen(false);
@@ -231,6 +264,101 @@ export default function CashierPage() {
             Refresh
           </button>
         </div>
+{/*add order form cashier page */}
+
+
+<div className="space-y-4">
+  {/* Stat Card / Button Block */}
+  <div className="bg-white border-l-4 border-amber-500 p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Quick Actions</p>
+      <button
+        onClick={() => setOrderDisp(!orderDisp)}
+        className="mt-1 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-lg transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+      >
+        <PlusCircle className="w-4 h-4" />
+        {orderDisp ? 'Close Add Order' : 'Add Order'}
+      </button>
+    </div>
+
+    {/* Table Selection Dropdown */}
+    {orderDisp && tables && tables.length > 0 && (
+      <div className="flex items-center gap-2">
+        <label htmlFor="table-select" className="text-xs font-semibold text-slate-600">
+          Select Table:
+        </label>
+        <select
+          id="table-select"
+          value={selectedTableId}
+          onChange={(e) => setSelectedTableId(e.target.value)}
+          className="text-xs font-medium p-2 border rounded-lg bg-white border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800"
+        >
+          <option value="">-- Select Table --</option>
+          {tables.map((table) => (
+            <option key={table._id || table.tableNumber} value={table._id}>
+              Table {table.tableNumber} ({table.capacity} seats)
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+  </div>
+
+  {/* Render Creatorder Component when a table is selected */}
+  {orderDisp && selectedTableId && (
+    <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm animate-in fade-in duration-200">
+      <Createorder tableId={selectedTableId} />
+    </div>
+  )}
+</div>
+{/* create order for room  */}
+
+<div className="space-y-4">
+  {/* Stat Card / Button Block */}
+  <div className="bg-white border-l-4 border-blue-500 p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Room Service</p>
+      <button
+        onClick={() => setRoomOrderDisp(!roomOrderDisp)}
+        className="mt-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-sm rounded-lg transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+      >
+        <PlusCircle className="w-4 h-4" />
+        {roomOrderDisp ? 'Close Add Order' : 'Add Room Order'}
+      </button>
+    </div>
+
+    {/* Room Selection Dropdown */}
+    {roomOrderDisp && rooms && rooms.length > 0 && (
+      <div className="flex items-center gap-2">
+        <label htmlFor="room-select" className="text-xs font-semibold text-slate-600">
+          Select Room:
+        </label>
+        <select
+          id="room-select"
+          value={selectedRoomId}
+          onChange={(e) => setSelectedRoomId(e.target.value)}
+          className="text-xs font-medium p-2 border rounded-lg bg-white border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+        >
+          <option value="">-- Select Room --</option>
+          {rooms.map((room) => (
+            <option key={room._id || room.roomNumber} value={room._id}>
+              Room {room.roomNumber}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+  </div>
+
+  {/* Render Creatorder Component when a room is selected */}
+  {roomOrderDisp && selectedRoomId && (
+    <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm animate-in fade-in duration-200">
+      {/* Assuming your Creatorder component can accept a roomId prop */}
+      <Createorder roomId={selectedRoomId} />
+    </div>
+  )}
+</div>
+        
 
         {/* Status Metrics Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -243,6 +371,7 @@ export default function CashierPage() {
               <CheckCircle className="w-6 h-6" />
             </div>
           </div>
+          
 
           <div className="bg-white border-l-4 border-amber-500 p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
             <div>
@@ -458,18 +587,48 @@ export default function CashierPage() {
 
                       {/* Order-Level Payment Action */}
                       <div className="pt-3 border-t border-slate-100 space-y-3 bg-slate-50/70 p-3 rounded-lg">
-                        <div className="flex justify-between items-center">
-                          <label className="text-xs font-semibold text-slate-600">Payment Status:</label>
-                          <select
-                            value={payment}
-                            onChange={(e) => setPayment(e.target.value as 'pending' | 'paid' | 'onroom')}
-                            className="text-xs font-medium px-2 py-1 border rounded-md bg-white border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            <option value="pending">Pending</option>
-                            <option value="paid">Paid (Cash/Card)</option>
-                            <option value="onroom">Charge to Room</option>
-                          </select>
-                        </div>
+                      <div className="space-y-3">
+  {/* Payment Status Dropdown */}
+  <div className="flex justify-between items-center">
+    <label className="text-xs font-semibold text-slate-600">Payment Status:</label>
+    <select
+      value={payment}
+      onChange={(e) => {
+        const val = e.target.value as 'pending' | 'paid' | 'onroom';
+        setPayment(val);
+        // Automatically toggle display flag based on selected value
+        setUpdateroomOrderDisp(val === 'onroom');
+      }}
+      className="text-xs font-medium px-2 py-1 border rounded-md bg-white border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      <option value="pending">Pending</option>
+      <option value="paid">Paid (Cash/Card)</option>
+      <option value="onroom">Charge to Room</option>
+    </select>
+  </div>
+
+  {/* Room Selector - Renders conditionally in JSX */}
+  {payment === 'onroom' && rooms && rooms.length > 0 && (
+    <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+      <label htmlFor="room-select" className="text-xs font-semibold text-slate-600">
+        Select Room:
+      </label>
+      <select
+        id="room-select"
+        value={onRoomId}
+        onChange={(e) => setOnRoomId(e.target.value)}
+        className="text-xs font-medium p-2 border rounded-lg bg-white border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+      >
+        <option value="">-- Select Room --</option>
+        {rooms.map((room) => (
+          <option key={room._id || room.roomNumber} value={room._id}>
+            Room {room.roomNumber}
+          </option>
+        ))}
+      </select>
+    </div>
+  )}
+</div>
 
                         <div className="flex justify-between items-center font-bold text-slate-900 text-sm">
                           <span>Ticket Total:</span>
@@ -517,7 +676,55 @@ export default function CashierPage() {
         )}
       </div>
 
-      {/* Order Popup / Modal */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm max-w-lg">
+  <div className="flex justify-between items-center border-b pb-4 mb-4">
+    <div>
+      <h3 className="text-lg font-bold text-slate-900">Shift Daily Summary</h3>
+      <p className="text-xs text-slate-500">Cashier Register #1 • Today</p>
+    </div>
+    <button 
+      onClick={() => window.print()} 
+      className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors"
+    >
+      Print Z-Report
+    </button>
+  </div>
+
+  {/* Key Metrics */}
+  <div className="grid grid-cols-2 gap-3 mb-6">
+    <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+      <p className="text-xs text-emerald-600 font-medium">Total Collected</p>
+      <p className="text-2xl font-black text-emerald-900">$1,240.50</p>
+    </div>
+    <div className="bg-amber-50 p-3 rounded-xl border border-amber-100">
+      <p className="text-xs text-amber-600 font-medium">Unpaid / Open Bills</p>
+      <p className="text-2xl font-black text-amber-900">2 Orders</p>
+    </div>
+  </div>
+
+  {/* Payment Breakdown Table */}
+  <div className="space-y-2 text-sm">
+    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Payment Breakdown</p>
+    <div className="flex justify-between text-slate-600 border-b border-dashed pb-1">
+      <span>Cash Drawer</span>
+      <span className="font-semibold text-slate-900">$450.00</span>
+    </div>
+    <div className="flex justify-between text-slate-600 border-b border-dashed pb-1">
+      <span>Card / POS</span>
+      <span className="font-semibold text-slate-900">$620.50</span>
+    </div>
+    <div className="flex justify-between text-slate-600 border-b border-dashed pb-1">
+      <span>Billed to Room</span>
+      <span className="font-semibold text-slate-900">$170.00</span>
+    </div>
+  </div>
+
+  {/* Audit Controls */}
+  <div className="mt-6 pt-4 border-t border-slate-200 flex justify-between text-xs text-slate-500">
+    <span>Discounts Given: <strong>$15.00</strong></span>
+    <span>Voids / Cancelled: <strong>1 item ($8.50)</strong></span>
+  </div>
+</div>
      
     </div>
   );

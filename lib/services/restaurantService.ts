@@ -29,12 +29,13 @@ export interface FoodOrderItem {
 }
 
 export interface FoodOrderData {
-  userId?:string;
+  userId:string | mongoose.Types.ObjectId;
   tableId?: string | mongoose.Types.ObjectId;
   booking_id?:string | mongoose.Types.ObjectId;
   roomId?: string | mongoose.Types.ObjectId;
+  totalPrice?: number|null|undefined;
   foods: FoodOrderItem[];
-  paymentStatus:'pending'|'paid'|'onroom';
+  paymentStatus: 'pending' | 'paidByBank' | 'onroom'| 'paidByTelebirr' |'paidByCash'| 'returned';
   status?: 'pending' | 'preparing' | 'ready' | 'served'  | 'cancelled';
   specialReq?: string;
 }
@@ -50,6 +51,7 @@ export interface ReservationData {
   specialRequest?: string;
   status?: "pending" | "confirmed" | "cancelled" | "completed";
 }
+
 
 
 
@@ -98,7 +100,9 @@ let totalPrice = 0;
 for (const food of data.foods) {
   totalPrice += food.price * food.quantity;
 }
-   
+   if (!data.userId || !mongoose.Types.ObjectId.isValid(data.userId)) {
+  throw new Error("Invalid or missing User ID");
+}
  const orderedFood = await FoodOrder.create({
       userId: new mongoose.Types.ObjectId(data.userId),
       tableId: data.tableId ? new mongoose.Types.ObjectId(data.tableId) : undefined,
@@ -108,8 +112,8 @@ for (const food of data.foods) {
       paymentStatus: data.paymentStatus || 'pending',
       status: data.status || 'pending',
       specialReq: data.specialReq || '',
-    });
-    if (data.tableId) await Table.findByIdAndUpdate(data.tableId,{status:"occupied"})
+    })
+        if (data.tableId) await Table.findByIdAndUpdate(data.tableId,{status:"occupied"})
      
       return { success: true, data: orderedFood };
     } catch (error: any) {
@@ -153,4 +157,61 @@ for (const food of data.foods) {
   } catch (error: any) {
     return { success: false, error: error.message };
   }
+}
+// GET /api/reports/admin/daily-breakdown
+export async function getAdminDailySummary(dateString: string) {
+  const startOfDay = new Date(dateString);
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date(dateString);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const summary = await FoodOrder.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: startOfDay, $lte: endOfDay },
+        isDeleted: false,
+        paymentStatus: { $ne: "pending" } // Only count completed sales
+      }
+    },
+    {
+      $group: {
+        _id: "$userId", // Group by Cashier
+        totalOrdersCount: { $sum: 1 },
+        totalSalesAmount: { $sum: "$totalPrice" },
+        cashSales: {
+          $sum: {
+            $cond: [{ $eq: ["$paymentStatus", "paidByCash"] }, "$totalPrice", 0]
+          }
+        },
+        telebirrSales: {
+          $sum: {
+            $cond: [{ $eq: ["$paymentStatus", "paidByTelebirr"] }, "$totalPrice", 0]
+          }
+        },
+        bankSales: {
+          $sum: {
+            $cond: [{ $eq: ["$paymentStatus", "paidByBank"] }, "$totalPrice", 0]
+          }
+        },
+        roomSales: {
+          $sum: {
+            $cond: [{ $eq: ["$paymentStatus", "onroom"] }, "$totalPrice", 0]
+          }
+        }
+      }
+    },
+    {
+      // Populate Cashier Name/Details from User collection
+      $lookup: {
+        from: "users",
+        localField: "_id",
+        foreignField: "_id",
+        as: "cashierInfo"
+      }
+    },
+    { $unwind: "$cashierInfo" }
+  ]);
+
+  return summary;
 }

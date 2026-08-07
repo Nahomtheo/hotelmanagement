@@ -16,7 +16,7 @@ export interface IFoodOrder extends Document {
   ];
 
   totalPrice: number;
-  paymentStatus: "pending" | "paid"|"onroom";
+  paymentStatus: 'pending' | 'paidByBank' | 'onroom'| 'paidByTelebirr' |'paidByCash'| 'returned';
   specialReq?: string;
 
   status:
@@ -82,7 +82,7 @@ const FoodOrderSchema = new Schema<IFoodOrder>(
 
     paymentStatus: {
       type: String,
-      enum: ["pending", "paid","onroom"],
+      enum: ["pending", "paidByBank", "onroom", "paidByTelebirr", "paidByCash", "returned"],
       default: "pending",
     },
 

@@ -45,11 +45,12 @@ const INITIAL_FORM_STATE: FoodOrderData & { foods: ExtendedCartItem[] } = {
 };
 
 type CreateOrderProps = 
-  | { tableId: string; roomId?: never; userId?: never }
-  | { roomId: string; tableId?: never; userId?: never }
-  | { userId: string; tableId?: never; roomId?: never };
+  | { tableId: string; roomId?: never; userId?: never; onSuccess?: () => void }
+  | { roomId: string; tableId?: never; userId?: never; onSuccess?: () => void }
+  | { userId: string; tableId?: never; roomId?: never; onSuccess?: () => void };
+  
 
-export default function Createorder({ tableId, roomId, userId }: CreateOrderProps) {
+export default function Createorder({ tableId, roomId, userId, onSuccess }: CreateOrderProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<EditableTable | null>(null);
@@ -63,12 +64,12 @@ useEffect(() => {
   // 1. Fetch menu data
   fetchMenu();
 
-  // 2. Initialize form state with target IDs
+  // 2. Initialize form state with target IDs (fallback to empty strings)
   setForm((prev) => ({
     ...prev,
-    tableId: tableId || undefined,
-    roomId: roomId || undefined,
-    userId: userId || undefined,
+    tableId: tableId || "",
+    roomId: roomId || "",
+    userId: userId || "",
   }));
 }, [tableId, roomId, userId]);
   
@@ -160,6 +161,7 @@ useEffect(() => {
         resetForm();
         setShowForm(false);
         fetchMenu();
+        onSuccess?.();
       } else {
         alert(`Error: ${data.error || "Failed to save order"}`);
       }

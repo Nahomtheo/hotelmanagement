@@ -1,6 +1,6 @@
 'use client';
 import Createorder from '@/components/Creat_Order';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo  } from 'react';
 import { 
   Users, 
   UtensilsCrossed, 
@@ -14,19 +14,19 @@ import {
   PlusCircle,
   ChevronDown
 } from 'lucide-react';
+import { useSession } from "next-auth/react";
 import { ReservationData, FoodOrderItem } from '@/lib/services/restaurantService';
-import { table } from 'console';
-import { map } from 'zod';
+import type { Types } from "mongoose";
 
 interface Order {
   _id: string;
-  userId: string;
+  userId: string | Types.ObjectId; // Adjusted to match the structure of userId
   tableId?: string;
   booking_id: string;
   roomId?: string;
   totalPrice?: number;
   foods: FoodOrderItem[];
-  paymentStatus: 'pending' | 'paid' | 'onroom';
+  paymentStatus: 'pending' | 'paidByBank' | 'onroom'| 'paidByTelebirr' |'paidByCash'| 'returned';
   status?: 'pending' | 'preparing' | 'ready' | 'served' | 'cancelled';
   specialReq?: string;
 }
@@ -48,13 +48,25 @@ interface TableData {
 
 
 export type TableStatus = 'occupied' | 'reserved' | 'available';
+export  function filterOrdersByPaymentStatus(orders: Order[], userId: string, status: 'pending' | 'paidByBank' | 'onroom'| 'paidByTelebirr' |'paidByCash'| 'returned') {
+    const filteredOrders = orders.filter(order => order.paymentStatus === status && (order.userId as any )?._id === userId);
+    let totalAmount = 0;
+    for (const order of filteredOrders) {
+      totalAmount += order.totalPrice || 0;
+    }
+
+
+    return { filteredOrders, totalAmount };
+  }
 
 export default function CashierPage() {
+  const { data: session } = useSession();
+  const userId = (session?.user as any)?.id || '';
   const [tables, setTables] = useState<TableData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [updateTReservation, setUpdateTReservation] = useState<ReservationData | null>(null);
   const [selectedTableO, setSelectedTableO] = useState<[]>([]);
-  const [payment, setPayment] = useState<'pending' | 'paid' | 'onroom'>('pending');
+  const [payment, setPayment] = useState<'pending' | 'paidByBank' | 'onroom'| 'paidByTelebirr' |'paidByCash'| 'returned'>('pending');
   const [updateroomOrderDisp, setUpdateroomOrderDisp] = useState(false);
   const [selectedTable, setSelectedTable] = useState<TableData | null>(null);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState<boolean>(false);
@@ -65,6 +77,7 @@ export default function CashierPage() {
   const [onRoomId, setOnRoomId] = useState<string>('');
    const [roomOrderDisp, setRoomOrderDisp] = useState(false);
    const [selectedRoomId, setSelectedRoomId] = useState<string>('');
+   const[allOrders, setAllOrders] = useState<Order[]>([]);
 
 
   // Form State for creating a new reservation on available tables
@@ -73,6 +86,21 @@ export default function CashierPage() {
     phone: '',
     reservationTime: ''
   });
+
+  const fetchAllOrders = async () => {
+    const params = new URLSearchParams();
+    params.append("createdAt", new Date().toISOString()); // Example filter, adjust as needed
+    try {
+      const res = await fetch(`/api/restaurant/foodorder?${params.toString()}`, { method: 'GET' });
+      if (res.ok) {
+        const data = await res.json();
+        setAllOrders(data.data || []);
+        
+      }
+    } catch (error) {
+      console.error('Error fetching all orders:', error);
+    }
+  };
 
   // 1. Fetch tables from API
   const fetchTables = async () => {
@@ -108,6 +136,8 @@ export default function CashierPage() {
   useEffect(() => {
     fetchTables();
     fetchRooms();
+    fetchAllOrders();
+    
   }, []);
 
   // Submit/Update Reservation
@@ -226,7 +256,7 @@ export default function CashierPage() {
         const res = await fetch(`/api/restaurant/foodorder?${params.toString()}`);
         if (res.ok) {
           const data = await res.json();
-          console.log (data.data,':this is the order')
+          console.log (data.data,':this is the order in the client side now')
           
           setSelectedTableO(data.data);
         }
@@ -240,6 +270,91 @@ export default function CashierPage() {
    
      
   };
+
+const filterO=() => {
+  // Synchronous execution - NO await needed
+  const cash =  filterOrdersByPaymentStatus(allOrders, userId, 'paidByCash');
+  const bank =  filterOrdersByPaymentStatus(allOrders, userId, 'paidByBank');
+  const room =  filterOrdersByPaymentStatus(allOrders, userId, 'onroom');
+  const telebirr =  filterOrdersByPaymentStatus(allOrders, userId, 'paidByTelebirr');
+  const pending =  filterOrdersByPaymentStatus(allOrders, userId, 'pending');
+  const returned =  filterOrdersByPaymentStatus(allOrders, userId, 'returned');
+
+  // Dynamic Metrics
+  const totalCollected = cash.totalAmount + bank.totalAmount + room.totalAmount + telebirr.totalAmount;
+  const pendingCount = pending.filteredOrders.length;
+  const returnedCount = returned.filteredOrders.length;
+
+  return (
+    <div>
+     <div className="grid grid-cols-2 gap-3 mb-6">
+  <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+    <p className="text-xs text-emerald-600 font-medium">Total Collected</p>
+    <p className="text-2xl font-black text-emerald-900">
+      ${totalCollected.toFixed(2)}
+    </p>
+  </div>
+  <div className="bg-amber-50 p-3 rounded-xl border border-amber-100">
+    <p className="text-xs text-amber-600 font-medium">Unpaid / Open Bills</p>
+    <p className="text-2xl font-black text-amber-900">
+      {returnedCount} {returnedCount === 1 ? 'Order' : 'Orders'}
+    </p>
+  </div>
+  <div className="bg-amber-50 p-3 rounded-xl border border-amber-100">
+    <p className="text-xs text-amber-600 font-medium">Pending Orders</p>
+    <p className="text-2xl font-black text-amber-900">
+      {pendingCount} {pendingCount === 1 ? 'Order' : 'Orders'}
+    </p>
+  </div>
+</div>
+
+{/* Payment Breakdown Table */}
+<div className="space-y-2 text-sm">
+  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+    Payment Breakdown
+  </p>
+
+  <div className="flex justify-between text-slate-600 border-b border-dashed pb-1">
+    <span>Cash Drawer</span>
+    <span className="font-semibold text-slate-900">
+      ${cash.totalAmount.toFixed(2)}
+    </span>
+  </div>
+
+  <div className="flex justify-between text-slate-600 border-b border-dashed pb-1">
+    <span>Card / POS</span>
+    <span className="font-semibold text-slate-900">
+      ${bank.totalAmount.toFixed(2)}
+    </span>
+  </div>
+
+  <div className="flex justify-between text-slate-600 border-b border-dashed pb-1">
+    <span>Billed to Room</span>
+    <span className="font-semibold text-slate-900">
+      ${room.totalAmount.toFixed(2)}
+    </span>
+  </div>
+
+  <div className="flex justify-between text-slate-600 border-b border-dashed pb-1">
+    <span>Telebirr Payments</span>
+    <span className="font-semibold text-slate-900">
+      ${telebirr.totalAmount.toFixed(2)}
+    </span>
+  </div>
+
+  <div className="flex justify-between text-slate-600 border-b border-dashed pb-1">
+    <span>Returned Orders</span>
+    <span className="font-semibold text-slate-900">
+      ${returned.totalAmount.toFixed(2)}
+    </span>
+  </div>
+</div>
+    </div>
+  );
+}
+
+  // Compute breakdown totals cleanly (runs filter once per payment type)
+
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-800 p-6 mt-10">
@@ -307,7 +422,10 @@ export default function CashierPage() {
   {/* Render Creatorder Component when a table is selected */}
   {orderDisp && selectedTableId && (
     <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm animate-in fade-in duration-200">
-      <Createorder tableId={selectedTableId} />
+      <Createorder tableId={selectedTableId} onSuccess={() => {
+        setOrderDisp(false);
+        fetchTables();
+      }} />
     </div>
   )}
 </div>
@@ -354,7 +472,10 @@ export default function CashierPage() {
   {roomOrderDisp && selectedRoomId && (
     <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm animate-in fade-in duration-200">
       {/* Assuming your Creatorder component can accept a roomId prop */}
-      <Createorder roomId={selectedRoomId} />
+      <Createorder roomId={selectedRoomId} onSuccess={() => {
+        setRoomOrderDisp(false);
+        fetchRooms();
+      }} />
     </div>
   )}
 </div>
@@ -594,7 +715,7 @@ export default function CashierPage() {
     <select
       value={payment}
       onChange={(e) => {
-        const val = e.target.value as 'pending' | 'paid' | 'onroom';
+        const val = e.target.value as 'pending' | 'paidByBank' | 'onroom'| 'paidByTelebirr' |'paidByCash';
         setPayment(val);
         // Automatically toggle display flag based on selected value
         setUpdateroomOrderDisp(val === 'onroom');
@@ -602,7 +723,9 @@ export default function CashierPage() {
       className="text-xs font-medium px-2 py-1 border rounded-md bg-white border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
       <option value="pending">Pending</option>
-      <option value="paid">Paid (Cash/Card)</option>
+      <option value="paidByBank">Paid (Bank Transfer)</option>
+      <option value="paidByTelebirr">Paid (Telebirr)</option>
+      <option value="paidByCash">Paid (Cash)</option>
       <option value="onroom">Charge to Room</option>
     </select>
   </div>
@@ -690,40 +813,9 @@ export default function CashierPage() {
     </button>
   </div>
 
-  {/* Key Metrics */}
-  <div className="grid grid-cols-2 gap-3 mb-6">
-    <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
-      <p className="text-xs text-emerald-600 font-medium">Total Collected</p>
-      <p className="text-2xl font-black text-emerald-900">$1,240.50</p>
-    </div>
-    <div className="bg-amber-50 p-3 rounded-xl border border-amber-100">
-      <p className="text-xs text-amber-600 font-medium">Unpaid / Open Bills</p>
-      <p className="text-2xl font-black text-amber-900">2 Orders</p>
-    </div>
-  </div>
+ {/* Top Summary Cards */}
 
-  {/* Payment Breakdown Table */}
-  <div className="space-y-2 text-sm">
-    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Payment Breakdown</p>
-    <div className="flex justify-between text-slate-600 border-b border-dashed pb-1">
-      <span>Cash Drawer</span>
-      <span className="font-semibold text-slate-900">$450.00</span>
-    </div>
-    <div className="flex justify-between text-slate-600 border-b border-dashed pb-1">
-      <span>Card / POS</span>
-      <span className="font-semibold text-slate-900">$620.50</span>
-    </div>
-    <div className="flex justify-between text-slate-600 border-b border-dashed pb-1">
-      <span>Billed to Room</span>
-      <span className="font-semibold text-slate-900">$170.00</span>
-    </div>
-  </div>
-
-  {/* Audit Controls */}
-  <div className="mt-6 pt-4 border-t border-slate-200 flex justify-between text-xs text-slate-500">
-    <span>Discounts Given: <strong>$15.00</strong></span>
-    <span>Voids / Cancelled: <strong>1 item ($8.50)</strong></span>
-  </div>
+  {filterO()}
 </div>
      
     </div>

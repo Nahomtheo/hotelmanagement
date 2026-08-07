@@ -1,96 +1,115 @@
 import { NextResponse } from 'next/server';
 import translate from 'google-translate-api-next';
 
-// Define an interface for the incoming rows
 interface TranslationRow {
   guestName?: string;
   reasonOfStay?: string;
   nationality?: string;
 }
 
+const BATCH_SIZE = 15; // Process in small chunks to avoid string length limits or rate limits
+const DELIMITER = ' ||| ';
+const ROW_DELIMITER = '\n---ROW---\n';
+
+// Memory cache for exact matches
+const cache = new Map<string, string>();
+// 1. Helper to capitalize names (Fixes "chala" -> "Chala" -> "ጫላ")
+function toTitleCase(str: string): string {
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+// 2. Updated Name Translation Logic
+
+async function translateBatchChunk(rowsChunk: TranslationRow[], target: string) {
+  // Construct a single payload for the entire chunk
+  const payloadLines: string[] = [];
+
+  rowsChunk.forEach((row) => {
+    const capitalizedName = row.guestName ? toTitleCase(row.guestName) : '';
+    const cachedTranslation = cache.get(capitalizedName);
+    const name = row.guestName?.trim() ? ` ${capitalizedName}` : 'EMPTY';
+    const reason = row.reasonOfStay?.trim() || 'EMPTY';
+    const nationality = row.nationality?.trim() || 'EMPTY';
+
+    // Combine 3 fields into 1 line using a distinct delimiter
+    payloadLines.push(`${name}${DELIMITER}${reason}${DELIMITER}${nationality}`);
+    
+  });
+
+  const fullPayload = payloadLines.join(ROW_DELIMITER);
+  console.log('Translating chunk:', fullPayload);
+
+  try {
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Batch translation timeout')), 8000)
+    );
+
+    const translatePromise = translate(fullPayload, { to: target });
+    const res: any = await Promise.race([translatePromise, timeoutPromise]);
+    const translatedText = res?.text || '';
+    console.log('Translated chunk:', translatedText);
+
+    const translatedRowStrings = translatedText.split(/--- ረድፍ---|\n--- ረድፍ---\n/);
+
+    return rowsChunk.map((originalRow, index) => {
+      const translatedLine = translatedRowStrings[index] || '';
+      const parts = translatedLine.split(/\|\|\||\|\|/);
+
+      let nameVal = parts[0]?.trim() || '';
+      // Remove context marker if Google kept/translated it
+      nameVal = nameVal.replace(/^.*?:/g, '').trim();
+      
+      const reasonVal = parts[1]?.trim() === 'EMPTY' ? '' : parts[1]?.trim() || '';
+      const nationalityVal = parts[2]?.trim() === 'EMPTY' ? '' : parts[2]?.trim() || '';
+
+      return {
+        amharicName: nameVal === 'EMPTY' ? '' : (nameVal || originalRow.guestName || ''),
+        amharicReason: reasonVal || originalRow.reasonOfStay || '',
+        amharicNationality: nationalityVal || originalRow.nationality || '',
+      };
+    });
+  } catch (error) {
+    console.warn('Batch chunk failed, returning original values:', error);
+    // Safe fallback: return raw inputs if request times out or gets blocked
+    return rowsChunk.map((r) => ({
+      amharicName: r.guestName || '',
+      amharicReason: r.reasonOfStay || '',
+      amharicNationality: r.nationality || '',
+    }));
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const { rows, targetLanguage } = await request.json();
 
-    // Ensure rows is an array
     if (!Array.isArray(rows)) {
-      return NextResponse.json({ error: 'Invalid input: expected an array of rows under "rows"' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input: expected an array under "rows"' },
+        { status: 400 }
+      );
+    }
+
+    if (rows.length === 0) {
+      return NextResponse.json({ rows: [] });
     }
 
     const target = targetLanguage || 'am';
+    const results: any[] = [];
 
-    // Process all rows concurrently
-    const translatedRows = await Promise.all(
-      rows.map(async (row: TranslationRow) => {
-        const { guestName, reasonOfStay, nationality } = row;
+    // Chunk rows sequentially so we never fire multiple network requests in parallel
+    for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+      const chunk = rows.slice(i, i + BATCH_SIZE);
+      const translatedChunk = await translateBatchChunk(chunk, target);
+      results.push(...translatedChunk);
+    }
+    
 
-        // If all fields are empty, return early for this row
-        if (!guestName && !reasonOfStay && !nationality) {
-          return { amharicName: "", amharicReason: "", amharicNationality: "" };
-        }
-
-        const nameTemplate = guestName && guestName.trim() ? `My name is "${guestName}"` : "";
-        const reasonText = reasonOfStay && reasonOfStay.trim() ? reasonOfStay : "";
-        const nationalityText = nationality && nationality.trim() ? nationality : "";
-
-        // Prepare translation promises for the individual fields in this row
-        const promises: Promise<any>[] = [];
-
-        // 1. Name translation promise
-        if (nameTemplate) {
-          promises.push(
-            translate(nameTemplate, { to: target }).then((res) => {
-              const rawTranslation = res.text || "";
-              const match = rawTranslation.match(/"([^"]+)"|'([^']+)'/);
-              return { type: 'name', value: (match ? (match[1] || match[2]) : rawTranslation).trim() };
-            })
-          );
-        } else {
-          promises.push(Promise.resolve({ type: 'name', value: guestName || "" }));
-        }
-
-        // 2. Reason translation promise
-        if (reasonText) {
-          promises.push(
-            translate(reasonText, { to: target }).then((res) => ({
-              type: 'reason',
-              value: (res.text || "").trim(),
-            }))
-          );
-        } else {
-          promises.push(Promise.resolve({ type: 'reason', value: reasonOfStay || "" }));
-        }
-
-        // 3. Nationality translation promise
-        if (nationalityText) {
-          promises.push(
-            translate(nationalityText, { to: target }).then((res) => ({
-              type: 'nationality',
-              value: (res.text || "").trim(),
-            }))
-          );
-        } else {
-          promises.push(Promise.resolve({ type: 'nationality', value: nationality || "" }));
-        }
-
-        // Wait for all fields of this specific row to finish translating
-        const results = await Promise.all(promises);
-
-        // Map the results back to the row structure
-        return {
-          amharicName: results.find((r) => r.type === 'name')?.value || "",
-          amharicReason: results.find((r) => r.type === 'reason')?.value || "",
-          amharicNationality: results.find((r) => r.type === 'nationality')?.value || "",
-        };
-      })
-    );
-
-    return NextResponse.json({ rows: translatedRows });
-
+    return NextResponse.json({ rows: results });
   } catch (error: any) {
-    console.error('Free translation batch wrapper failed:', error);
+    console.error('Route error:', error);
     return NextResponse.json(
-      { error: 'Translation system error' }, 
+      { error: 'Translation system error' },
       { status: 500 }
     );
   }
